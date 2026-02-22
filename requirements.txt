@@ -1,0 +1,7 @@
+Django>=5.2,<5.3
+gunicorn
+whitenoise
+pyodbc
+azure-identity
+sqlalchemy
+pandas

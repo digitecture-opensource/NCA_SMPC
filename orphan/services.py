@@ -2,9 +2,9 @@ import pandas as pd
 from sqlalchemy import text
 from .dbconnect import get_engine
 
-QUERY_PAGE1 = """
+QUERY_PAGE1_BASE = """
 SELECT  [orphan_id]
-      ,[smpc_id]
+      ,  cast(smpc_id as varchar(100)) as smpc_id
       ,[source_status]
       ,[source_file]
       ,[product_name]
@@ -16,8 +16,9 @@ SELECT  [orphan_id]
       ,[designation_suffix]
       ,[orphan_me_expiry_date]
       ,[designation_removed_date]
-      ,[loaded_utc]
-  FROM [rim].[MHRA_OrphanDesignation];
+     
+  FROM [rim].[MHRA_OrphanDesignation]
+  where 1=1
 """
 
 QUERY_PAGE2_A = """
@@ -65,9 +66,41 @@ WHERE od.orphan_id = :orphan_id;
 """
 
 
-def load_page1_df() -> pd.DataFrame:
+def load_page1_df(
+    product_q: str = "",
+    substance_q: str = "",
+    auth_numbers: list[str] | None = None,
+    top_n: int = 2000,
+) -> pd.DataFrame:
+    """
+    Server-side filtering in SQL (LIKE %...%) + optional auth list filter.
+    Limits rows with TOP to keep the page snappy.
+    """
+    sql = f"SELECT TOP ({int(top_n)}) * FROM ( {QUERY_PAGE1_BASE} ) AS q"
+    params = {}
+
+    if product_q:
+        sql += " AND q.product_name LIKE :product_like"
+        params["product_like"] = f"%{product_q}%"
+
+    if substance_q:
+        sql += " AND q.active_substance LIKE :substance_like"
+        params["substance_like"] = f"%{substance_q}%"
+
+    if auth_numbers:
+        # Build a parameter list (:a0, :a1, ...)
+        placeholders = []
+        for i, val in enumerate(auth_numbers):
+            key = f"a{i}"
+            placeholders.append(f":{key}")
+            params[key] = val
+        sql += f" AND CAST(q.authorisation_number AS NVARCHAR(100)) IN ({', '.join(placeholders)})"
+
+    # Ordering (optional, makes list stable)
+    sql += " ORDER BY smpc_id desc "
+
     with get_engine().connect() as conn:
-        return pd.read_sql_query(text(QUERY_PAGE1), conn)
+        return pd.read_sql_query(text(sql), conn, params=params)
 
 
 def load_page2_details(orphan_id: int) -> tuple[pd.DataFrame, pd.DataFrame]:
