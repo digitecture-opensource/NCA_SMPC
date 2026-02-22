@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Details {{ orphan_id }}</title>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; }
+    .card { border:1px solid #eee; padding:12px; margin:12px 0; background:#fafafa; }
+    .grid { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; }
+    .label { color:#666; font-size:12px; }
+    textarea { width:100%; height: 240px; font-family: Consolas, monospace; font-size: 12px; }
+    .tabs button { margin-right:8px; margin-top:6px; }
+  </style>
+  <script>
+    function showTab(id) {
+      document.querySelectorAll(".pane").forEach(p => p.style.display = "none");
+      document.getElementById(id).style.display = "block";
+    }
+  </script>
+</head>
+<body>
+  <div class="topbar">
+    <div>
+      <a href="/">&larr; Back</a>
+      <h2 style="display:inline-block; margin-left:12px;">Details: orphan_id {{ orphan_id }}</h2>
+    </div>
+    <div>
+      Logged in as <b>{{ request.user.username }}</b> |
+      <a href="/logout/">Logout</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div><b>Workflow status:</b> {{ item.status }}</div>
+    {% if item.reviewer_comment %}
+      <div style="margin-top:6px;"><b>Reviewer comment:</b> {{ item.reviewer_comment }}</div>
+    {% endif %}
+
+    {% if can_submit and item.status != "SUBMITTED" and item.status != "APPROVED" %}
+      <div style="margin-top:10px;">
+        <a href="{% url 'orphan:submit' orphan_id %}"><button>Submit</button></a>
+      </div>
+    {% endif %}
+
+    {% if can_approve and item.status == "SUBMITTED" %}
+      <form method="post" action="{% url 'orphan:approve' orphan_id %}" style="margin-top:10px;">
+        {% csrf_token %}
+        <div><b>Approver comment (optional)</b></div>
+        <input type="text" name="comment" style="width:60%;" />
+        <button type="submit">Approve</button>
+      </form>
+
+      <form method="post" action="{% url 'orphan:return' orphan_id %}" style="margin-top:10px;">
+        {% csrf_token %}
+        <div><b>Return comment (recommended)</b></div>
+        <input type="text" name="comment" style="width:60%;" />
+        <button type="submit">Send back</button>
+      </form>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h3>Summary</h3>
+    <div class="grid">
+      <div><div class="label">Product (SMPC)</div><div><b>{{ summary.product_name_smpc }}</b></div></div>
+      <div><div class="label">Product (OD)</div><div><b>{{ summary.product_name_od }}</b></div></div>
+      <div><div class="label">PL number (OD)</div><div><b>{{ summary.pl_number_od }}</b></div></div>
+      <div><div class="label">Active substance (OD)</div><div><b>{{ summary.active_substance_od }}</b></div></div>
+      <div><div class="label">Dose form (SMPC)</div><div><b>{{ summary.dose_form_smpc }}</b></div></div>
+      <div><div class="label">AI confidence</div><div><b>{{ summary.ai_confidence }}</b></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Text sections</h3>
+    <div class="tabs">
+      {% for k,v in sections %}
+        <button type="button" onclick="showTab('pane{{ forloop.counter }}')">{{ k }}</button>
+      {% endfor %}
+    </div>
+
+    {% for k,v in sections %}
+      <div class="pane" id="pane{{ forloop.counter }}" style="display:{% if forloop.first %}block{% else %}none{% endif %}; margin-top:10px;">
+        <div class="label">{{ k }}</div>
+        <textarea readonly>{{ v }}</textarea>
+      </div>
+    {% endfor %}
+  </div>
+</body>
+</html>
