@@ -9,6 +9,14 @@
     table { border-collapse: collapse; width: 100%; font-size: 13px; }
     th, td { border: 1px solid #ddd; padding: 6px; vertical-align: top; }
     th { background: #f5f5f5; position: sticky; top: 0; }
+
+
+
+  table { table-layout: fixed; width: 100%; }
+  th, td { word-wrap: break-word; overflow-wrap: anywhere; }
+  /* Make indications less dominant */
+  td.indications, th.indications { font-size: 12px; }
+
   </style>
 </head>
 <body>
@@ -50,16 +58,28 @@
 
   <div style="overflow:auto; max-height: 70vh;">
     <table>
+      <colgroup>
+  <col style="width: 10%;">  <!-- Link -->
+  <col style="width: 6%;">   <!-- internal id -->
+  <col style="width: 6%;">   <!-- smpc id -->
+  <col style="width: 8%;">   <!-- status -->
+  <col style="width: 10%;">  <!-- product -->
+  <col style="width: 18%;">  <!-- active substance -->
+  <col style="width: 8%;">   <!-- PL -->
+  <col style="width: 28%;">  <!-- indications (smaller than before) -->
+  <col style="width: 6%;">   <!-- expiry date (wider than before) -->
+</colgroup>
       <thead>
         <tr>
           <th>Link to detailed view</th>
-          <th>orphan_id</th>
+          <th>Internal id - OD</th>
           <th>SMPC ID (if available)</th>
-          <th>source_status</th>
-          <th>product_name</th>
-          <th>active_substance</th>
-          <th>authorisation_number</th>
-          <th>od_indication</th>
+          <th>Orphan Designation status</th>
+          <th>Product Name </th>
+          <th>Active substance (Orphan Designation)</th>
+          <th>PL Number </th>
+          <th class="indications">Orphan Designation - indications</th>
+          <th>OD Expiry Date</th>
         
         </tr>
       </thead>
@@ -73,8 +93,8 @@
             <td>{{ r.product_name }}</td>
             <td>{{ r.active_substance }}</td>
             <td>{{ r.authorisation_number }}</td>
-            <td>{{ r.od_indication }}</td>
-            <td>{{ r.loaded_utc }}</td>
+            <td class="indications">{{ r.od_indication }}</td>
+            <td>{{ r.orphan_me_expiry_date }}</td>
           </tr>
         {% endfor %}
       </tbody>
