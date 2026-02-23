@@ -63,8 +63,11 @@ def page2_detail(request, orphan_id: int):
         ("Full Designation Number(OD)", detail.get("designation_number_raw", "")),
     ]
 
+    smpc_url_toHTML = detail.get("SMPC_URL", "")
+
     return render(request, "orphan/page2_detail.html", {
         "orphan_id": orphan_id,
         "summary": summary,
         "sections": sections,
+        "smpc_url_toHTML": smpc_url_toHTML,
     })

@@ -111,6 +111,13 @@
       </div>
       {% endfor %}
   </div>
-  <h4> Link to SMPC: <a href="{{ sections.SMPC_URL }}" target="_blank">SMPC on MHRA's Product Portal</a></h4>
+  <h4>
+  Link to SMPC:
+  {% if smpc_url %}
+    <a href="{{ smpc_url }}" target="_blank" rel="noopener">SMPC on MHRA's Product Portal</a>
+  {% else %}
+    <span style="color:#666;">Not available</span>
+  {% endif %}
+</h4>
 </body>
 </html>
