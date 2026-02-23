@@ -60,6 +60,7 @@ def page2_detail(request, orphan_id: int):
         ("Container description", detail.get("container_description", "")),
         ("Handling/Disposal", detail.get("handling_disposal", "")),
         ("SMPC_URL", detail.get("SMPC_URL", "")),
+        ("Full Designation Number(OD)", detail.get("designation_number_raw", "")),
     ]
 
     return render(request, "orphan/page2_detail.html", {

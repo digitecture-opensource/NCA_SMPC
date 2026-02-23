@@ -63,7 +63,7 @@ SELECT
     , s.[S_6_4_storage]                  AS [storage]
     , s.[S_6_5_container_description]    AS [container_description]
     , s.[S_6_6_handling_disposal]        AS [handling_disposal]
-     , od.[designation_number_raw] AS "OD - Designation text"
+     , od.[designation_number_raw] AS "designation_number_raw"
     , smd.[Metadata_Storage_Path] AS SMPC_URL
 FROM [rim].[MHRA_OrphanDesignation] od
 left outer JOIN [Staging].[SMPC] s on od.smpc_id = s.id
