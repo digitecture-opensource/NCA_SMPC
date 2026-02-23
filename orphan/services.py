@@ -115,5 +115,9 @@ def load_page2_details(orphan_id: int) -> tuple[pd.DataFrame, pd.DataFrame]:
     with get_engine().connect() as conn:
         a = pd.read_sql_query(text(QUERY_PAGE2_A), conn, params={"orphan_id": orphan_id})
         b = pd.read_sql_query(text(QUERY_PAGE2_B), conn, params={"orphan_id": orphan_id})
-        logger.info ("SMPC URL " + b["SMPC_URL"].iloc[0] )
+        smpc_url = None
+        if not b.empty and "SMPC_URL" in b.columns:
+            smpc_url = b["SMPC_URL"].iloc[0]  # could still be None
+
+        logger.info("SMPC URL: %s", smpc_url)  # safe even if None
     return a, b
