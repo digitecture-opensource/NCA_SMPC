@@ -27,7 +27,7 @@ SELECT
     , od.product_name AS [product_name_od]
     , s.[S2_Composition] AS [composition_smpc]
     , od.[active_substance] AS [active_substance_od]
-      , od.[designation_suffix] AS "Designation suffix"
+      , od.[designation_suffix] AS "Designation_suffix"
  
     , sub.preferred_name AS [ai_ema_substance]
     , sub.sms_id AS [ai_ema_sms_id]
