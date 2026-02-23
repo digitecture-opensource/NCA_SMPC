@@ -5,7 +5,7 @@ import logging
 logger = logging.getLogger("orphan.views")
 
 QUERY_PAGE1_BASE = """
-SELECT   [orphan_id]
+SELECT   [source_rownum] as [orphan_id]
       ,  cast(smpc_id as varchar(100)) as smpc_id
       ,[source_status]
       ,[source_file]
@@ -53,6 +53,8 @@ QUERY_PAGE2_B = """
 SELECT
       od.authorisation_number AS [pl_number_od]
     , od.od_indication AS [od_indication]
+     , od.[designation_number_raw] AS [designation_number_raw]
+     , od.[orphan_condition] AS [orphan_condition]
     , s.[S_4_1_therapeutic_indications]  AS [indications]
     , s.[S_4_3_contraindications]        AS [contraindications]
     , s.[S_4_4_warnings_precautions]     AS [warnings_precautions]
@@ -65,7 +67,7 @@ SELECT
     , s.[S_6_4_storage]                  AS [storage]
     , s.[S_6_5_container_description]    AS [container_description]
     , s.[S_6_6_handling_disposal]        AS [handling_disposal]
-     , od.[designation_number_raw] AS "designation_number_raw"
+    
     , smd.[Metadata_Storage_Path] AS SMPC_URL
 FROM [rim].[MHRA_OrphanDesignation] od
 left outer JOIN [Staging].[SMPC] s on od.smpc_id = s.id

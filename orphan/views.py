@@ -46,21 +46,23 @@ def page2_detail(request, orphan_id: int):
     
 
     sections = [
-        ("OD Indication", detail.get("od_indication", "")),
+        ("OD Indication (OD)", detail.get("od_indication", "")),
+        ("Full Designation Number(OD)", detail.get("designation_number_raw", "")),
+        ("Orphan Condition(OD)", detail.get("orphan_condition", "")),
         ("All Indications (SMPC)", detail.get("indications", "")),
         ("All Contraindications (SMPC)", detail.get("contraindications", "")),
-        ("Warnings/Precautions", detail.get("warnings_precautions", "")),
-        ("Interactions", detail.get("interactions", "")),
-        ("Pregnancy/Lactation", detail.get("pregnancy_lactation", "")),
-        ("Driving/Machines", detail.get("driving_machines", "")),
-        ("Undesirable effects", detail.get("undesirable_effects", "")),
-        ("Overdose", detail.get("overdose", "")),
-        ("Shelf life", detail.get("shelf_life", "")),
-        ("Storage", detail.get("storage", "")),
-        ("Container description", detail.get("container_description", "")),
-        ("Handling/Disposal", detail.get("handling_disposal", "")),
-        ("SMPC_URL", detail.get("SMPC_URL", "")),
-        ("Full Designation Number(OD)", detail.get("designation_number_raw", "")),
+        ("Warnings/Precautions (SMPC)", detail.get("warnings_precautions", "")),
+        ("Interactions (SMPC)", detail.get("interactions", "")),
+        ("Pregnancy/Lactation (SMPC)", detail.get("pregnancy_lactation", "")),
+        ("Driving/Machines (SMPC)", detail.get("driving_machines", "")),
+        ("Undesirable effects (SMPC)", detail.get("undesirable_effects", "")),
+        ("Overdose (SMPC)", detail.get("overdose", "")),
+        ("Shelf life (SMPC)", detail.get("shelf_life", "")),
+        ("Storage (SMPC)", detail.get("storage", "")),
+        ("Container description (SMPC)", detail.get("container_description", "")),
+        ("Handling/Disposal (SMPC)", detail.get("handling_disposal", "")),
+        ("SMPC_URL ", detail.get("SMPC_URL", "")),
+        
     ]
 
     smpc_url_toHTML = detail.get("SMPC_URL", "")
