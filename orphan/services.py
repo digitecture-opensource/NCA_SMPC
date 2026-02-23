@@ -27,6 +27,8 @@ SELECT
     , od.product_name AS [product_name_od]
     , s.[S2_Composition] AS [composition_smpc]
     , od.[active_substance] AS [active_substance_od]
+      , od.[designation_suffix] AS "Designation suffix"
+ 
     , sub.preferred_name AS [ai_ema_substance]
     , sub.sms_id AS [ai_ema_sms_id]
     , sas.rationale_substance_match AS [ai_rationale]
@@ -37,6 +39,7 @@ SELECT
     , s.[s_8_authorisation_number] AS [pl_number_smpc]
     , s.[S_9_authorisation_date] AS [auth_date_smpc]
     , s.[S_10_revision_date] AS [revision_date_smpc]
+
 FROM  [rim].[MHRA_OrphanDesignation] od 
 left outer JOIN [Staging].[SMPC] s on od.smpc_id = s.id
 LEFT OUTER JOIN Staging.SMPC_Active_Substance sas on sas.SMPC_id = s.id and Substance_role = 'Active'
@@ -60,6 +63,7 @@ SELECT
     , s.[S_6_4_storage]                  AS [storage]
     , s.[S_6_5_container_description]    AS [container_description]
     , s.[S_6_6_handling_disposal]        AS [handling_disposal]
+     , od.[designation_number_raw] AS "OD - Designation text"
     , smd.[Metadata_Storage_Path] AS SMPC_URL
 FROM [rim].[MHRA_OrphanDesignation] od
 left outer JOIN [Staging].[SMPC] s on od.smpc_id = s.id
