@@ -42,7 +42,7 @@ def page2_detail(request, orphan_id: int):
     summary = df_a.fillna("").to_dict(orient="records")[0] if len(df_a) else {}
     detail = df_b.fillna("").to_dict(orient="records")[0] if len(df_b) else {}
     logger.info("Details page. Number of records in summary=%s, detail=%s", len(df_a), len(df_b))
-    logger.info ("SMPC URL " + detail.get("smcp_url", "N/A"))
+    logger.info ("SMPC URL " + detail.get("SMPC_URL", "N/A"))
     
 
     sections = [
