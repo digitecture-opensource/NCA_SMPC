@@ -61,8 +61,8 @@ SELECT
     , s.[S_6_5_container_description]    AS [container_description]
     , s.[S_6_6_handling_disposal]        AS [handling_disposal]
     , smd.[Metadata_Storage_Path] AS SMPC_URL
-FROM [Staging].[SMPC] s
-left outer JOIN [rim].[MHRA_OrphanDesignation] od on od.smpc_id = s.id
+FROM [rim].[MHRA_OrphanDesignation] od
+left outer JOIN [Staging].[SMPC] s on od.smpc_id = s.id
 left outer join [Staging].[SMPC_Meta_data] smd on smd.smpc_id = s.id
 WHERE od.orphan_id = :orphan_id;
 """
