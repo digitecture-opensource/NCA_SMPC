@@ -20,7 +20,7 @@ SELECT   [orphan_id]
       ,[designation_removed_date]
      
   FROM [rim].[MHRA_OrphanDesignation]
-  where 1=1
+  
 """
 
 QUERY_PAGE2_A = """
@@ -84,7 +84,7 @@ def load_page1_df(
     Server-side filtering in SQL (LIKE %...%) + optional auth list filter.
     Limits rows with TOP to keep the page snappy.
     """
-    sql = f"SELECT TOP ({int(top_n)}) * FROM ( {QUERY_PAGE1_BASE} ) AS q"
+    sql = f"SELECT TOP ({int(top_n)}) * FROM ( {QUERY_PAGE1_BASE} ) as q WHERE 1=1 "
     params = {}
 
     if product_q:
