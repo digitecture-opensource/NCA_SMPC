@@ -1,6 +1,9 @@
 from django.shortcuts import render
 from django.http import Http404
 from .services import load_page1_df, load_page2_details
+import logging
+logger = logging.getLogger("orphan.views")
+
 
 
 def page1_list(request):
@@ -38,6 +41,9 @@ def page2_detail(request, orphan_id: int):
 
     summary = df_a.fillna("").to_dict(orient="records")[0] if len(df_a) else {}
     detail = df_b.fillna("").to_dict(orient="records")[0] if len(df_b) else {}
+    logger.info("Details page. Number of records in summary=%s, detail=%s", len(df_a), len(df_b))
+    
+    
 
     sections = [
         ("OD Indication", detail.get("od_indication", "")),
@@ -53,6 +59,7 @@ def page2_detail(request, orphan_id: int):
         ("Storage", detail.get("storage", "")),
         ("Container description", detail.get("container_description", "")),
         ("Handling/Disposal", detail.get("handling_disposal", "")),
+        ("SMCP_URL", detail.get("smcp_url", "")),
     ]
 
     return render(request, "orphan/page2_detail.html", {

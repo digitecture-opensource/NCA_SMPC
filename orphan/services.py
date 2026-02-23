@@ -3,7 +3,7 @@ from sqlalchemy import text
 from .dbconnect import get_engine
 
 QUERY_PAGE1_BASE = """
-SELECT  [orphan_id]
+SELECT   [orphan_id]
       ,  cast(smpc_id as varchar(100)) as smpc_id
       ,[source_status]
       ,[source_file]
@@ -38,7 +38,7 @@ SELECT
     , s.[S_9_authorisation_date] AS [auth_date_smpc]
     , s.[S_10_revision_date] AS [revision_date_smpc]
 FROM [Staging].[SMPC] s
-INNER JOIN [rim].[MHRA_OrphanDesignation] od on od.smpc_id = s.id
+left outer JOIN [rim].[MHRA_OrphanDesignation] od on od.smpc_id = s.id
 LEFT OUTER JOIN Staging.SMPC_Active_Substance sas on sas.SMPC_id = s.id and Substance_role = 'Active'
 LEFT OUTER JOIN Staging.Substance sub on sub.substance_sk = sas.Substance_sk
 WHERE od.orphan_id = :orphan_id;
@@ -60,8 +60,10 @@ SELECT
     , s.[S_6_4_storage]                  AS [storage]
     , s.[S_6_5_container_description]    AS [container_description]
     , s.[S_6_6_handling_disposal]        AS [handling_disposal]
+    , smd.[Metadata_Storage_Path] AS SMPC_URL
 FROM [Staging].[SMPC] s
-INNER JOIN [rim].[MHRA_OrphanDesignation] od on od.smpc_id = s.id
+left outer JOIN [rim].[MHRA_OrphanDesignation] od on od.smpc_id = s.id
+left outer join [Staging].[SMPC_Meta_data] smd on smd.smpc_id = s.id
 WHERE od.orphan_id = :orphan_id;
 """
 

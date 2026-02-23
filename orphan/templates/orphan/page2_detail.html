@@ -21,7 +21,7 @@
 <body>
   <div>
     <a href="/">&larr; Back</a>
-    <h2 style="display:inline-block; margin-left:12px;">Details: orphan_id {{ orphan_id }}</h2>
+    <h2 style="display:inline-block; margin-left:12px;">Detailed SMPC and OD register data for: {{ summary.product_name_od }}</h2>
   </div>
 
   <div class="card">
@@ -95,7 +95,8 @@
   </div>
 
   <div class="card">
-    <h3>Please click on the buttons below to look at the detailed information for the section as extracted from SMPC / Orphan Designation register </h3>
+    <h3> Further information for : {{ summary.product_name_smpc }}</h3>
+    <h4>Please click on the buttons below to look at the detailed information for the section as extracted from SMPC / Orphan Designation register </h4>
     <div class="tabs">
       {% for k,v in sections %}
         <button type="button" onclick="showTab('pane{{ forloop.counter }}')">{{ k }}</button>
@@ -107,7 +108,8 @@
         <div class="label">{{ k }}</div>
         <textarea readonly>{{ v }}</textarea>
       </div>
-    {% endfor %}
+      {% endfor %}
   </div>
+  <h4> Link to SMPC: <a href="{{ summary.smcp_url }}" target="_blank">SMPC on MHRA's Product Portal</a></h4>
 </body>
 </html>
