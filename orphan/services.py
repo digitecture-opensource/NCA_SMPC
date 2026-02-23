@@ -37,8 +37,8 @@ SELECT
     , s.[s_8_authorisation_number] AS [pl_number_smpc]
     , s.[S_9_authorisation_date] AS [auth_date_smpc]
     , s.[S_10_revision_date] AS [revision_date_smpc]
-FROM [Staging].[SMPC] s
-left outer JOIN [rim].[MHRA_OrphanDesignation] od on od.smpc_id = s.id
+FROM  [rim].[MHRA_OrphanDesignation] od 
+left outer JOIN [Staging].[SMPC] s on od.smpc_id = s.id
 LEFT OUTER JOIN Staging.SMPC_Active_Substance sas on sas.SMPC_id = s.id and Substance_role = 'Active'
 LEFT OUTER JOIN Staging.Substance sub on sub.substance_sk = sas.Substance_sk
 WHERE od.orphan_id = :orphan_id;
