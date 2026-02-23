@@ -5,7 +5,7 @@ import logging
 logger = logging.getLogger("orphan.views")
 
 QUERY_PAGE1_BASE = """
-SELECT   [source_rownum] as [orphan_id]
+SELECT   [orphan_id]
       ,  cast(smpc_id as varchar(100)) as smpc_id
       ,[source_status]
       ,[source_file]
