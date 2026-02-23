@@ -1,6 +1,8 @@
 import pandas as pd
 from sqlalchemy import text
 from .dbconnect import get_engine
+import logging
+logger = logging.getLogger("orphan.views")
 
 QUERY_PAGE1_BASE = """
 SELECT   [orphan_id]
@@ -113,4 +115,5 @@ def load_page2_details(orphan_id: int) -> tuple[pd.DataFrame, pd.DataFrame]:
     with get_engine().connect() as conn:
         a = pd.read_sql_query(text(QUERY_PAGE2_A), conn, params={"orphan_id": orphan_id})
         b = pd.read_sql_query(text(QUERY_PAGE2_B), conn, params={"orphan_id": orphan_id})
+        logger.info ("SMPC URL " + b["SMPC_URL"].iloc[0] )
     return a, b
