@@ -79,6 +79,7 @@ WHERE od.orphan_id = :orphan_id;
 def load_page1_df(
     product_q: str = "",
     substance_q: str = "",
+    flag_q: str = "",
     auth_numbers: list[str] | None = None,
     top_n: int = 2000,
 ) -> pd.DataFrame:
@@ -96,6 +97,9 @@ def load_page1_df(
     if substance_q:
         sql += " AND q.active_substance LIKE :substance_like"
         params["substance_like"] = f"%{substance_q}%"
+    if flag_q:
+        sql += " AND lower(q.source_status) =  :flag_like"
+        params["flag_like"] = f"{flag_q}".lower()
 
     if auth_numbers:
         # Build a parameter list (:a0, :a1, ...)

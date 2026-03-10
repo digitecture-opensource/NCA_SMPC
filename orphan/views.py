@@ -9,6 +9,7 @@ logger = logging.getLogger("orphan.views")
 def page1_list(request):
     product_q = (request.GET.get("product_q", "") or "").strip()
     substance_q = (request.GET.get("substance_q", "") or "").strip()
+    status_q = (request.GET.get("status_q", "") or "").strip()
 
     # Multi-select OR paste list
     auth_multi = request.GET.getlist("authorisation_number")
@@ -19,6 +20,7 @@ def page1_list(request):
     df = load_page1_df(
         product_q=product_q,
         substance_q=substance_q,
+        flag_q=status_q,
         auth_numbers=auth_all if auth_all else None,
         top_n=2000,
     )
@@ -29,8 +31,9 @@ def page1_list(request):
         "rows": rows,
         "product_q": product_q,
         "substance_q": substance_q,
+        "status_q": status_q,
         "auth_text": auth_text,
-        "selected_auth": auth_multi,  # if you still keep a multiselect
+        "selected_auth": auth_multi,
     })
 
 def page2_detail(request, orphan_id: int):

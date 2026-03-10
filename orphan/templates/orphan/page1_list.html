@@ -38,6 +38,15 @@
              placeholder="e.g. 'imatinib'">
     </div>
 
+    <div style="min-width:160px; max-width:240px; flex: 0 1 200px;">
+      <label><b>OD Status</b></label><br>
+      <select name="status_q" style="width:100%; box-sizing:border-box; height:32px;">
+        <option value="" {% if not status_q %}selected{% endif %}>— All —</option>
+        <option value="Current" {% if status_q == "Current" %}selected{% endif %}>Current</option>
+        <option value="Expired" {% if status_q == "Expired" %}selected{% endif %}>Expired</option>
+      </select>
+    </div>
+
     <div style="min-width:260px; flex: 1 1 320px;">
       <label><b>Authorisation numbers (paste multiple)</b></label><br>
       <textarea name="auth_text" rows="3" style="width:100%; box-sizing:border-box;">{{ auth_text }}</textarea>
