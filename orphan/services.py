@@ -130,15 +130,15 @@ def load_page1_df(
 
 QUERY_SMPC_LIST_BASE = """
 SELECT [id]
-      ,[S1_Name_of_Medicinal_product]  AS "Medicinal Product Name"
-      ,[S2_Composition]                AS "Composition - Active"
-      ,[S3_pharmaceutical_form]        AS "Dose Form"
-      ,[S_6_1_excipients]              AS "List of excipients"
-      ,[S_6_3_shelf_life]              AS "Shelf life"
-      ,[S_7_marketing_authorisation_holder] AS "Authorisation holder"
-      ,[s_8_authorisation_number]      AS "Authorisation number"
-      ,[S_9_authorisation_date]        AS "Authorisation date"
-      ,[S_10_revision_date]            AS "Last revision date"
+      ,[S1_Name_of_Medicinal_product]       AS product_name
+      ,[S2_Composition]                     AS composition
+      ,[S3_pharmaceutical_form]             AS dose_form
+      ,[S_6_1_excipients]                   AS excipients
+      ,[S_6_3_shelf_life]                   AS shelf_life
+      ,[S_7_marketing_authorisation_holder] AS auth_holder
+      ,[s_8_authorisation_number]           AS auth_number
+      ,[S_9_authorisation_date]             AS auth_date
+      ,[S_10_revision_date]                 AS revision_date
 FROM [Staging].[SMPC]
 WHERE id > 160
 """
@@ -159,27 +159,27 @@ def load_smpc_list_df(
     params = {}
 
     if product_q:
-        sql += " AND q.[Medicinal Product Name] LIKE :product_like"
+        sql += " AND q.product_name LIKE :product_like"
         params["product_like"] = f"%{product_q}%"
 
     if composition_q:
-        sql += " AND q.[Composition - Active] LIKE :composition_like"
+        sql += " AND q.composition LIKE :composition_like"
         params["composition_like"] = f"%{composition_q}%"
 
     if auth_date_after:
-        sql += " AND q.[Authorisation date] >= :auth_after"
+        sql += " AND q.auth_date >= :auth_after"
         params["auth_after"] = auth_date_after
 
     if auth_date_before:
-        sql += " AND q.[Authorisation date] <= :auth_before"
+        sql += " AND q.auth_date <= :auth_before"
         params["auth_before"] = auth_date_before
 
     if revision_date_after:
-        sql += " AND q.[Last revision date] >= :rev_after"
+        sql += " AND q.revision_date >= :rev_after"
         params["rev_after"] = revision_date_after
 
     if revision_date_before:
-        sql += " AND q.[Last revision date] <= :rev_before"
+        sql += " AND q.revision_date <= :rev_before"
         params["rev_before"] = revision_date_before
 
     sql += " ORDER BY q.id DESC"

@@ -94,13 +94,13 @@
         {% for r in rows %}
           <tr>
             <td>{{ r.id }}</td>
-            <td>{{ r["Medicinal Product Name"] }}</td>
-            <td>{{ r["Composition - Active"] }}</td>
-            <td>{{ r["Dose Form"] }}</td>
-            <td>{{ r["Authorisation holder"] }}</td>
-            <td>{{ r["Authorisation number"] }}</td>
-            <td>{{ r["Authorisation date"] }}</td>
-            <td>{{ r["Last revision date"] }}</td>
+            <td>{{ r.product_name }}</td>
+            <td>{{ r.composition }}</td>
+            <td>{{ r.dose_form }}</td>
+            <td>{{ r.auth_holder }}</td>
+            <td>{{ r.auth_number }}</td>
+            <td>{{ r.auth_date }}</td>
+            <td>{{ r.revision_date }}</td>
             <td><a href="/smpc/{{ r.id }}/">See Details</a></td>
           </tr>
         {% endfor %}
