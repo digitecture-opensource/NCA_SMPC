@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import Http404
-from .services import load_page1_df, load_page2_details
+from .services import load_page1_df, load_page2_details, load_smpc_list_df, load_smpc_detail
 import logging
 logger = logging.getLogger("orphan.views")
 
@@ -10,6 +10,8 @@ def page1_list(request):
     product_q = (request.GET.get("product_q", "") or "").strip()
     substance_q = (request.GET.get("substance_q", "") or "").strip()
     status_q = (request.GET.get("status_q", "") or "").strip()
+    expiry_after = (request.GET.get("expiry_after", "") or "").strip()
+    expiry_before = (request.GET.get("expiry_before", "") or "").strip()
 
     # Multi-select OR paste list
     auth_multi = request.GET.getlist("authorisation_number")
@@ -22,6 +24,8 @@ def page1_list(request):
         substance_q=substance_q,
         flag_q=status_q,
         auth_numbers=auth_all if auth_all else None,
+        expiry_after=expiry_after,
+        expiry_before=expiry_before,
         top_n=2000,
     )
 
@@ -32,6 +36,8 @@ def page1_list(request):
         "product_q": product_q,
         "substance_q": substance_q,
         "status_q": status_q,
+        "expiry_after": expiry_after,
+        "expiry_before": expiry_before,
         "auth_text": auth_text,
         "selected_auth": auth_multi,
     })
@@ -75,4 +81,72 @@ def page2_detail(request, orphan_id: int):
         "summary": summary,
         "sections": sections,
         "smpc_url_toHTML": smpc_url_toHTML,
+    })
+
+
+def smpc_list(request):
+    product_q = (request.GET.get("product_q", "") or "").strip()
+    composition_q = (request.GET.get("composition_q", "") or "").strip()
+    auth_date_after = (request.GET.get("auth_date_after", "") or "").strip()
+    auth_date_before = (request.GET.get("auth_date_before", "") or "").strip()
+    revision_date_after = (request.GET.get("revision_date_after", "") or "").strip()
+    revision_date_before = (request.GET.get("revision_date_before", "") or "").strip()
+
+    df = load_smpc_list_df(
+        product_q=product_q,
+        composition_q=composition_q,
+        auth_date_after=auth_date_after,
+        auth_date_before=auth_date_before,
+        revision_date_after=revision_date_after,
+        revision_date_before=revision_date_before,
+    )
+
+    rows = df.fillna("").to_dict(orient="records")
+
+    return render(request, "orphan/smpc_list.html", {
+        "rows": rows,
+        "product_q": product_q,
+        "composition_q": composition_q,
+        "auth_date_after": auth_date_after,
+        "auth_date_before": auth_date_before,
+        "revision_date_after": revision_date_after,
+        "revision_date_before": revision_date_before,
+    })
+
+
+def smpc_detail(request, smpc_id: int):
+    try:
+        df = load_smpc_detail(smpc_id)
+    except Exception as e:
+        raise Http404(f"Could not load SMPC id={smpc_id}. Error: {e}")
+
+    if df.empty:
+        raise Http404(f"No SMPC found for id={smpc_id}")
+
+    record = df.fillna("").to_dict(orient="records")[0]
+
+    # Summary fields shown in top card
+    summary_keys = [
+        "S1_Name_of_Medicinal_product",
+        "S2_Composition",
+        "S3_pharmaceutical_form",
+        "S_7_marketing_authorisation_holder",
+        "s_8_authorisation_number",
+        "S_9_authorisation_date",
+        "S_10_revision_date",
+    ]
+    summary = {k: record.get(k, "") for k in summary_keys}
+
+    # All remaining columns as tabs (skip id and summary fields)
+    skip = {"id"} | set(summary_keys)
+    sections = [
+        (col, record[col])
+        for col in record
+        if col not in skip and record[col] != ""
+    ]
+
+    return render(request, "orphan/smpc_detail.html", {
+        "smpc_id": smpc_id,
+        "summary": summary,
+        "sections": sections,
     })

@@ -81,6 +81,8 @@ def load_page1_df(
     substance_q: str = "",
     flag_q: str = "",
     auth_numbers: list[str] | None = None,
+    expiry_after: str = "",
+    expiry_before: str = "",
     top_n: int = 2000,
 ) -> pd.DataFrame:
     """
@@ -97,9 +99,10 @@ def load_page1_df(
     if substance_q:
         sql += " AND q.active_substance LIKE :substance_like"
         params["substance_like"] = f"%{substance_q}%"
+
     if flag_q:
-        sql += " AND lower(q.source_status) =  :flag_like"
-        params["flag_like"] = f"{flag_q}".lower()
+        sql += " AND lower(q.source_status) = :flag_like"
+        params["flag_like"] = flag_q.lower()
 
     if auth_numbers:
         # Build a parameter list (:a0, :a1, ...)
@@ -110,11 +113,84 @@ def load_page1_df(
             params[key] = val
         sql += f" AND CAST(q.authorisation_number AS NVARCHAR(100)) IN ({', '.join(placeholders)})"
 
+    if expiry_after:
+        sql += " AND q.orphan_me_expiry_date >= :expiry_after"
+        params["expiry_after"] = expiry_after
+
+    if expiry_before:
+        sql += " AND q.orphan_me_expiry_date <= :expiry_before"
+        params["expiry_before"] = expiry_before
+
     # Ordering (optional, makes list stable)
     sql += " ORDER BY smpc_id desc "
 
     with get_engine().connect() as conn:
         return pd.read_sql_query(text(sql), conn, params=params)
+
+
+QUERY_SMPC_LIST_BASE = """
+SELECT [id]
+      ,[S1_Name_of_Medicinal_product]  AS "Medicinal Product Name"
+      ,[S2_Composition]                AS "Composition - Active"
+      ,[S3_pharmaceutical_form]        AS "Dose Form"
+      ,[S_6_1_excipients]              AS "List of excipients"
+      ,[S_6_3_shelf_life]              AS "Shelf life"
+      ,[S_7_marketing_authorisation_holder] AS "Authorisation holder"
+      ,[s_8_authorisation_number]      AS "Authorisation number"
+      ,[S_9_authorisation_date]        AS "Authorisation date"
+      ,[S_10_revision_date]            AS "Last revision date"
+FROM [Staging].[SMPC]
+WHERE id > 160
+"""
+
+QUERY_SMPC_DETAIL = "SELECT * FROM [Staging].[SMPC] WHERE id = :smpc_id"
+
+
+def load_smpc_list_df(
+    product_q: str = "",
+    composition_q: str = "",
+    auth_date_after: str = "",
+    auth_date_before: str = "",
+    revision_date_after: str = "",
+    revision_date_before: str = "",
+    top_n: int = 2000,
+) -> pd.DataFrame:
+    sql = f"SELECT TOP ({int(top_n)}) * FROM ( {QUERY_SMPC_LIST_BASE} ) AS q WHERE 1=1"
+    params = {}
+
+    if product_q:
+        sql += " AND q.[Medicinal Product Name] LIKE :product_like"
+        params["product_like"] = f"%{product_q}%"
+
+    if composition_q:
+        sql += " AND q.[Composition - Active] LIKE :composition_like"
+        params["composition_like"] = f"%{composition_q}%"
+
+    if auth_date_after:
+        sql += " AND q.[Authorisation date] >= :auth_after"
+        params["auth_after"] = auth_date_after
+
+    if auth_date_before:
+        sql += " AND q.[Authorisation date] <= :auth_before"
+        params["auth_before"] = auth_date_before
+
+    if revision_date_after:
+        sql += " AND q.[Last revision date] >= :rev_after"
+        params["rev_after"] = revision_date_after
+
+    if revision_date_before:
+        sql += " AND q.[Last revision date] <= :rev_before"
+        params["rev_before"] = revision_date_before
+
+    sql += " ORDER BY q.id DESC"
+
+    with get_engine().connect() as conn:
+        return pd.read_sql_query(text(sql), conn, params=params)
+
+
+def load_smpc_detail(smpc_id: int) -> pd.DataFrame:
+    with get_engine().connect() as conn:
+        return pd.read_sql_query(text(QUERY_SMPC_DETAIL), conn, params={"smpc_id": smpc_id})
 
 
 def load_page2_details(orphan_id: int) -> tuple[pd.DataFrame, pd.DataFrame]:
