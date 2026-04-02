@@ -33,9 +33,17 @@ def logout_view(request):
 @login_required
 def od_apply(request):
     submitted = False
+    draft_saved = False
     if request.method == "POST":
-        submitted = True
-    return render(request, "orphan/od_apply.html", {"submitted": submitted})
+        action = request.POST.get("action", "submit")
+        if action == "draft":
+            draft_saved = True
+        else:
+            submitted = True
+    return render(request, "orphan/od_apply.html", {
+        "submitted": submitted,
+        "draft_saved": draft_saved,
+    })
 
 
 def page1_list(request):

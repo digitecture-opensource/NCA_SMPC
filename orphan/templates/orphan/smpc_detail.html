@@ -4,14 +4,54 @@
 {% block extra_head %}
 <style>
   .grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
-  textarea { width:100%; height:260px; font-family:Consolas, monospace; font-size:12px; }
-  .tabs button { margin-right:8px; margin-top:6px; background:#eee; border:1px solid #ccc; padding:5px 12px; border-radius:3px; cursor:pointer; }
-  .tabs button:hover { background:#ddd; }
+
+  /* Section tabs */
+  .tab-bar { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
+  .tab-btn {
+    padding: 6px 14px;
+    font-size: 13px;
+    font-family: Arial, sans-serif;
+    border: 1px solid #c9c9c9;
+    border-radius: 20px;
+    background: #f4f4f4;
+    color: #444;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { background: #e8e8e8; }
+  .tab-btn.active { background: #8b1111; color: #fff; border-color: #8b1111; font-weight: bold; }
+
+  /* Section content pane */
+  .section-pane { display: none; }
+  .section-pane.visible { display: block; }
+  .section-title {
+    font-size: 15px;
+    font-weight: bold;
+    color: #8b1111;
+    margin-bottom: 10px;
+  }
+  .section-body {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 16px 20px;
+    font-size: 14px;
+    font-family: Georgia, 'Times New Roman', serif;
+    line-height: 1.7;
+    color: #222;
+    white-space: pre-wrap;
+    min-height: 120px;
+    max-height: 520px;
+    overflow-y: auto;
+  }
 </style>
 <script>
-  function showTab(id) {
-    document.querySelectorAll(".pane").forEach(p => p.style.display = "none");
-    document.getElementById(id).style.display = "block";
+  function showTab(id, btn) {
+    document.querySelectorAll(".section-pane").forEach(p => p.classList.remove("visible"));
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.getElementById(id).classList.add("visible");
+    btn.classList.add("active");
   }
 </script>
 {% endblock %}
@@ -31,7 +71,7 @@
       <div><div class="label">Last Revision Date</div><div>{{ summary.S_10_revision_date }}</div></div>
       <div style="grid-column:1 / -1;">
         <div class="label">Composition / Active Substance</div>
-        <div style="white-space:pre-wrap; max-height:120px; overflow:auto; padding:6px; border:1px solid #eee; background:#fff;">{{ summary.S2_Composition }}</div>
+        <div style="white-space:pre-wrap; max-height:120px; overflow:auto; padding:6px; border:1px solid #eee; background:#fff; font-family:Georgia,serif; font-size:14px; line-height:1.6;">{{ summary.S2_Composition }}</div>
       </div>
     </div>
   </div>
@@ -39,16 +79,17 @@
   {% if sections %}
   <div class="card">
     <h3>Further information for: {{ summary.S1_Name_of_Medicinal_product }}</h3>
-    <h4>Please click on the buttons below to view each section extracted from the SMPC.</h4>
-    <div class="tabs">
+    <p style="color:#666; font-size:13px; margin-top:-8px;">Select a section below to read the extracted SMPC content.</p>
+    <div class="tab-bar">
       {% for k, v in sections %}
-        <button type="button" onclick="showTab('pane{{ forloop.counter }}')">{{ k }}</button>
+        <button type="button" class="tab-btn {% if forloop.first %}active{% endif %}"
+                onclick="showTab('pane{{ forloop.counter }}', this)">{{ k }}</button>
       {% endfor %}
     </div>
     {% for k, v in sections %}
-      <div class="pane" id="pane{{ forloop.counter }}" style="display:{% if forloop.first %}block{% else %}none{% endif %}; margin-top:10px;">
-        <div class="label">{{ k }}</div>
-        <textarea readonly>{{ v }}</textarea>
+      <div class="section-pane {% if forloop.first %}visible{% endif %}" id="pane{{ forloop.counter }}">
+        <div class="section-title">{{ k }}</div>
+        <div class="section-body">{{ v }}</div>
       </div>
     {% endfor %}
   </div>

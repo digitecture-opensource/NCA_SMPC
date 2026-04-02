@@ -58,6 +58,12 @@
 
 {% else %}
 
+{% if draft_saved %}
+<div style="background:#fff8e1; border:1px solid #ffe082; border-radius:4px; padding:12px 18px; margin-bottom:18px;">
+  <strong>Draft saved.</strong> Your responses have been saved. You can return to complete and submit this form at any time.
+</div>
+{% endif %}
+
 <h2>Request Orphan Designation</h2>
 <p style="color:#555;">
   Signed in as <strong>{{ request.user.username }}</strong> &mdash;
@@ -289,7 +295,9 @@
     </div>
     <div class="form-actions">
       <a href="/" style="margin-right:20px; color:#8b1111;">Cancel</a>
-      <button type="submit">Submit Application</button>
+      <button type="submit" name="action" value="draft"
+              style="background:#555; margin-right:10px;">Save Draft</button>
+      <button type="submit" name="action" value="submit">Submit Application</button>
     </div>
   </div>
 
