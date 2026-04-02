@@ -1,0 +1,62 @@
+{% extends "orphan/base.html" %}
+{% block title %}MHRA Data Portal — Home{% endblock %}
+
+{% block content %}
+<h2 style="color:#8b1111;">Welcome to the MHRA Regulatory Data Portal</h2>
+
+<div class="card">
+  <p>
+    The purpose of this app is to use the data from MHRA and showcase how regulators currently manage and publish
+    datasets that are of huge importance to members of the public, healthcare professionals and hospitals. However,
+    due to low investment in technology, a number of regulators such as MHRA, SwissMedic, PMDA and the African Union
+    struggle to surface this data in a structured, interactive, searchable format that increases the utility of those datasets.
+  </p>
+  <p>
+    This portal aims to highlight certain areas where regulators can use the data they hold, align with IDMP, and surface
+    public data in a more usable and impactful fashion. This micro-site is a <strong>Proof of Concept</strong> that:
+  </p>
+  <ul>
+    <li>Uses a number of AI tools such as <strong>Claude AI</strong> (for web app development) and <strong>OpenAI</strong> for coding of substances</li>
+    <li>Delivers the solution using low-cost, open-source Python frameworks</li>
+    <li>Showcases that a lot is possible with even the datasets regulators currently hold</li>
+    <li>Makes a strong, compelling case for stronger collaboration with regulators</li>
+  </ul>
+</div>
+
+<h3 style="margin-top:30px;">Sections of this Micro-App</h3>
+
+<div class="card">
+  <h3 style="color:#8b1111; margin-top:0;"><a href="/orphan/" style="color:#8b1111;">Orphan Designations</a></h3>
+  <p>
+    This page shows a listing of all products that have current and past Orphan Designations. The page demonstrates a
+    potential option where data can be surfaced in a simple listing instead of a CSV download. Once data is available
+    in a database, the regulator can automate the end-to-end journey for Orphan Designation management.
+  </p>
+  <p>
+    Orphan Designation review is usually undertaken as a mini-process running in parallel with the Marketing Authorisation.
+    The regulator could offer a simple portal that:
+  </p>
+  <ul>
+    <li>Allows companies to request Orphan Designation via a secure portal</li>
+    <li>Provides a simple internal workflow for review and assessment</li>
+    <li>Offers document exchange to support the application</li>
+    <li>Once approved, automatically pushes data into the table exposed on the public portal</li>
+    <li>Keeps all other datasets in the same environment but protected under a secure zone controlled using industry-standard RBAC</li>
+  </ul>
+  <a href="/orphan/" style="color:#8b1111; font-weight:bold;">Browse Orphan Designations &rarr;</a>
+</div>
+
+<div class="card">
+  <h3 style="color:#8b1111; margin-top:0;"><a href="/smpc/" style="color:#8b1111;">Digitised SMPC</a></h3>
+  <p>
+    The SMPC (Summary of Product Characteristics) is a structured document. If the sections of the PDF are extracted
+    into a database, the utility of the data increases manifold. The FDA offers APIs under its OpenFDA framework, but
+    other regulators struggle to offer a similar service.
+  </p>
+  <p>
+    This service takes approximately 400 SMPCs, digitises them, and makes them available as a searchable public portal —
+    demonstrating how regulators could easily make their existing document libraries far more accessible and useful.
+  </p>
+  <a href="/smpc/" style="color:#8b1111; font-weight:bold;">Browse SMPC Listing &rarr;</a>
+</div>
+{% endblock %}

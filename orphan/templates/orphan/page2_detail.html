@@ -1,33 +1,28 @@
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Details {{ summary.product_name_od }}</title>
-  <style>
-    body { font-family: Arial; margin: 20px; }
-    .card { border:3px solid #f1e0e0; padding:12px; margin:12px 0; background:#fafafa; }
-    .grid { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; }
-    .label { color:#8b1111; font: size 16px; }
-    textarea { width:50%; height: 260px; font-family: Consolas, monospace; font-size: 12px; }
-    .tabs button { margin-right:8px; margin-top:6px; }
-  </style>
-  <script>
-    function showTab(id) {
-      document.querySelectorAll(".pane").forEach(p => p.style.display = "none");
-      document.getElementById(id).style.display = "block";
-    }
-  </script>
-</head>
-<body>
-  <div>
-    <a href="/">&larr; Back</a>
-    <h2 style="display:inline-block; margin-left:12px;">Detailed SMPC and OD register data for: {{ summary.product_name_od }}</h2>
-  </div>
+{% extends "orphan/base.html" %}
+{% block title %}Details {{ summary.product_name_od }}{% endblock %}
+
+{% block extra_head %}
+<style>
+  .grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+  textarea { width:50%; height:260px; font-family:Consolas, monospace; font-size:12px; }
+  .tabs button { margin-right:8px; margin-top:6px; background:#eee; border:1px solid #ccc; padding:5px 12px; border-radius:3px; cursor:pointer; }
+  .tabs button:hover { background:#ddd; }
+</style>
+<script>
+  function showTab(id) {
+    document.querySelectorAll(".pane").forEach(p => p.style.display = "none");
+    document.getElementById(id).style.display = "block";
+  }
+</script>
+{% endblock %}
+
+{% block content %}
+  <a href="/orphan/" class="back-link">&larr; Back to Orphan Designations</a>
+  <h2>Detailed SMPC and OD register data for: {{ summary.product_name_od }}</h2>
 
   <div class="card">
-    <h3>Data as extracted from Orphan Designation Register </h3>
+    <h3>Data as extracted from Orphan Designation Register</h3>
     <div class="grid">
-      
       <div><div class="label"><b>Product (OD)</b></div><div>{{ summary.product_name_od }}</div></div>
       <div><div class="label"><b>PL number (OD)</b></div><div>{{ summary.pl_number_od }}</div></div>
       <div><div class="label"><b>OD Designation ID (OD)</b></div><div>{{ summary.Designation_suffix }}</div></div>
@@ -36,88 +31,79 @@
   </div>
 
   <div class="card">
-    <h3>Data as extracted from SMPC. (PS: More information at bottom of the page)  </h3>
+    <h3>Data as extracted from SMPC. (PS: More information at bottom of the page)</h3>
     <div class="grid">
       <div><div class="label"><b>Product (SMPC)</b></div><div>{{ summary.product_name_smpc }}</div></div>
       <div><div class="label"><b>PL Number (SMPC)</b></div><div>{{ summary.pl_number_smpc }}</div></div>
       <div><div class="label"><b>Composition/ Active Substance (SMPC)</b></div><div>{{ summary.composition_smpc }}</div></div>
       <div><div class="label"><b>Dose form (SMPC)</b></div><div>{{ summary.dose_form_smpc }}</div></div>
-      <div><div class="label"><b>Marketing Authroisation holder details (SMPC)</b></div><div>{{ summary.ma_holder_smpc }}</div></div>
+      <div><div class="label"><b>Marketing Authorisation holder details (SMPC)</b></div><div>{{ summary.ma_holder_smpc }}</div></div>
     </div>
-  </div>
-
-<div class="card">
-  <h3>AI match to EMA Substance Dictionary</h3>
-  <p style="margin-top:6px; color:#555;">
-    We analysed the SMPC composition text and searched for the closest equivalent in EMA’s published substance dictionary.
-    The suggested match and supporting details are shown below.
-  </p>
-
-  <div class="grid" style="margin-top:10px;">
-    <div style="grid-column: 1 / -1;">
-      <div class="label"><b>SMPC composition / active substance</b></div>
-      <div style="white-space: pre-wrap; max-height: 140px; overflow:auto; padding:8px; border:1px solid #eee; background:#fff;">
-        {{ summary.composition_smpc }}
-      </div>
-    </div>
-
-    <div>
-      <div class="label"><b>Matched EMA substance</b></div>
-      <div><b>{{ summary.ai_ema_substance }}</b></div>
-    </div>
-
-    <div>
-      <div class="label"><b>EMA SMS ID</b></div>
-      <div style="font-family: Consolas, monospace;">{{ summary.ai_ema_sms_id }}</div>
-    </div>
-
-    <div>
-      <div class="label"><b>Confidence</b></div>
-      <div>
-        <span style="display:inline-block; padding:4px 10px; border-radius:12px; background:#eee;">
-          {{ summary.ai_confidence }}
-        </span>
-        <div style="font-size:12px; color:#777; margin-top:4px;">
-          Higher confidence means the match is more likely to be correct.
-        </div>
-      </div>
-    </div>
-
-    <div style="grid-column: 1 / -1;">
-      <details style="margin-top:8px;">
-        <summary style="cursor:pointer;"><b>Show AI rationale</b></summary>
-        <div style="margin-top:8px; white-space: pre-wrap; padding:8px; border:1px solid #eee; background:#fff;">
-          {{ summary.ai_rationale }}
-        </div>
-      </details>
-    </div>
-  </div>
-</div>
   </div>
 
   <div class="card">
-    <h3> Further information for : {{ summary.product_name_smpc }}</h3>
-    <h4>Please click on the buttons below to look at the detailed information for the section as extracted from SMPC / Orphan Designation register </h4>
+    <h3>AI match to EMA Substance Dictionary</h3>
+    <p style="margin-top:6px; color:#555;">
+      We analysed the SMPC composition text and searched for the closest equivalent in EMA's published substance dictionary.
+      The suggested match and supporting details are shown below.
+    </p>
+    <div class="grid" style="margin-top:10px;">
+      <div style="grid-column:1 / -1;">
+        <div class="label"><b>SMPC composition / active substance</b></div>
+        <div style="white-space:pre-wrap; max-height:140px; overflow:auto; padding:8px; border:1px solid #eee; background:#fff;">
+          {{ summary.composition_smpc }}
+        </div>
+      </div>
+      <div>
+        <div class="label"><b>Matched EMA substance</b></div>
+        <div><b>{{ summary.ai_ema_substance }}</b></div>
+      </div>
+      <div>
+        <div class="label"><b>EMA SMS ID</b></div>
+        <div style="font-family:Consolas, monospace;">{{ summary.ai_ema_sms_id }}</div>
+      </div>
+      <div>
+        <div class="label"><b>Confidence</b></div>
+        <div>
+          <span style="display:inline-block; padding:4px 10px; border-radius:12px; background:#eee;">
+            {{ summary.ai_confidence }}
+          </span>
+          <div style="font-size:12px; color:#777; margin-top:4px;">Higher confidence means the match is more likely to be correct.</div>
+        </div>
+      </div>
+      <div style="grid-column:1 / -1;">
+        <details style="margin-top:8px;">
+          <summary style="cursor:pointer;"><b>Show AI rationale</b></summary>
+          <div style="margin-top:8px; white-space:pre-wrap; padding:8px; border:1px solid #eee; background:#fff;">
+            {{ summary.ai_rationale }}
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Further information for: {{ summary.product_name_smpc }}</h3>
+    <h4>Please click on the buttons below to look at the detailed information for the section as extracted from SMPC / Orphan Designation register</h4>
     <div class="tabs">
-      {% for k,v in sections %}
+      {% for k, v in sections %}
         <button type="button" onclick="showTab('pane{{ forloop.counter }}')">{{ k }}</button>
       {% endfor %}
     </div>
-
-    {% for k,v in sections %}
+    {% for k, v in sections %}
       <div class="pane" id="pane{{ forloop.counter }}" style="display:{% if forloop.first %}block{% else %}none{% endif %}; margin-top:10px;">
         <div class="label">{{ k }}</div>
         <textarea readonly>{{ v }}</textarea>
       </div>
-      {% endfor %}
+    {% endfor %}
   </div>
+
   <h4>
-  Link to SMPC:
-  {% if smpc_url_toHTML %}
-    <a href="{{ smpc_url_toHTML }}" target="_blank" rel="noopener">SMPC on MHRA's Product Portal</a>
-  {% else %}
-    <span style="color:#666;">Not available</span>
-  {% endif %}
-</h4>
-</body>
-</html>
+    Link to SMPC:
+    {% if smpc_url_toHTML %}
+      <a href="{{ smpc_url_toHTML }}" target="_blank" rel="noopener">SMPC on MHRA's Product Portal</a>
+    {% else %}
+      <span style="color:#666;">Not available</span>
+    {% endif %}
+  </h4>
+{% endblock %}

@@ -6,6 +6,10 @@ logger = logging.getLogger("orphan.views")
 
 
 
+def home(request):
+    return render(request, "orphan/home.html")
+
+
 def page1_list(request):
     product_q = (request.GET.get("product_q", "") or "").strip()
     substance_q = (request.GET.get("substance_q", "") or "").strip()
