@@ -1,5 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import Http404
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from .services import load_page1_df, load_page2_details, load_smpc_list_df, load_smpc_detail
 import logging
 logger = logging.getLogger("orphan.views")
@@ -8,6 +10,32 @@ logger = logging.getLogger("orphan.views")
 
 def home(request):
     return render(request, "orphan/home.html")
+
+
+def login_view(request):
+    error = ""
+    if request.method == "POST":
+        user = authenticate(request,
+                            username=request.POST.get("username", ""),
+                            password=request.POST.get("password", ""))
+        if user is not None:
+            login(request, user)
+            return redirect(request.GET.get("next", "/od/apply/"))
+        error = "Invalid username or password."
+    return render(request, "orphan/login.html", {"error": error})
+
+
+def logout_view(request):
+    logout(request)
+    return redirect("/")
+
+
+@login_required
+def od_apply(request):
+    submitted = False
+    if request.method == "POST":
+        submitted = True
+    return render(request, "orphan/od_apply.html", {"submitted": submitted})
 
 
 def page1_list(request):

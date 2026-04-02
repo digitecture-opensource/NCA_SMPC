@@ -1,0 +1,298 @@
+{% extends "orphan/base.html" %}
+{% block title %}Request Orphan Designation{% endblock %}
+
+{% block extra_head %}
+<style>
+  .section-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .section-card h3 {
+    color: #8b1111;
+    margin-top: 0;
+    border-bottom: 2px solid #f1e0e0;
+    padding-bottom: 8px;
+  }
+  .field { margin-bottom: 20px; }
+  .field label { display: block; font-weight: bold; margin-bottom: 5px; }
+  .field .hint { font-size: 12px; color: #666; margin-bottom: 5px; }
+  .field textarea { width: 100%; padding: 8px; font-size: 13px; border: 1px solid #ccc; border-radius: 3px; resize: vertical; }
+  .field input[type=text] { width: 100%; padding: 8px; font-size: 13px; border: 1px solid #ccc; border-radius: 3px; }
+  .field input[type=file] { font-size: 13px; }
+  .checkbox-group label { font-weight: normal; display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+  .checkbox-group input[type=checkbox] { margin-top: 2px; flex-shrink: 0; }
+  .attachment-block {
+    background: #fafafa;
+    border: 1px dashed #ccc;
+    border-radius: 4px;
+    padding: 14px;
+    margin-top: 8px;
+  }
+  .attachment-block label { font-weight: bold; margin-bottom: 6px; display: block; }
+  .success-box {
+    background: #f0faf0;
+    border: 1px solid #b2dfb2;
+    padding: 24px;
+    border-radius: 4px;
+    text-align: center;
+    margin: 40px auto;
+    max-width: 600px;
+  }
+  .success-box h3 { color: #2e7d32; }
+  .form-actions { text-align: right; margin-top: 10px; }
+  .form-actions button { font-size: 15px; padding: 10px 32px; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% if submitted %}
+  <div class="success-box">
+    <h3>Application Submitted</h3>
+    <p>Thank you. Your Orphan Designation application has been received and will be reviewed by the assessment team.</p>
+    <p style="margin-top:16px;"><a href="/" style="color:#8b1111;">Return to Home</a></p>
+  </div>
+
+{% else %}
+
+<h2>Request Orphan Designation</h2>
+<p style="color:#555;">
+  Signed in as <strong>{{ request.user.username }}</strong> &mdash;
+  <a href="/logout/" style="color:#8b1111;">Sign out</a>
+</p>
+<p>
+  Please complete all sections below. Fields marked <span style="color:#b00;">*</span> are required.
+  Each section corresponds to a standard part of the Orphan Designation application.
+</p>
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+
+  <!-- ======================== SECTION A ======================== -->
+  <div class="section-card">
+    <h3>Section A &mdash; Description of the Condition</h3>
+
+    <div class="field">
+      <label>A1. Details of the condition <span style="color:#b00;">*</span></label>
+      <div class="hint">Select all that apply to your submission.</div>
+      <div class="checkbox-group">
+        <label><input type="checkbox" name="a1_definition"> Definition</label>
+        <label><input type="checkbox" name="a1_aetiology"> Aetiology</label>
+        <label><input type="checkbox" name="a1_specific_characteristics"> Specific characteristics (pathophysiological, histopathological, clinical characteristics)</label>
+        <label><input type="checkbox" name="a1_classification"> Classification</label>
+        <label><input type="checkbox" name="a1_diagnosis"> Diagnosis and symptoms</label>
+      </div>
+      <div style="margin-top:10px;">
+        <label style="font-weight:normal;">Supporting detail / narrative:</label>
+        <textarea name="a1_detail" rows="5" placeholder="Provide supporting detail for the selected options above..."></textarea>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>A2. Proposed orphan indication <span style="color:#b00;">*</span></label>
+      <div class="hint">State the proposed orphan indication precisely, as it will appear on the designation.</div>
+      <textarea name="a2_indication" rows="4" placeholder="e.g. Treatment of [condition] in [patient population]..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>A3. Medical plausibility <span style="color:#b00;">*</span></label>
+
+      <div style="margin-bottom:12px;">
+        <label style="font-weight:bold;">A3.1 Active substance</label>
+        <div class="hint">Describe the medicinal product, its pharmacological class and mode of action.</div>
+        <textarea name="a3_1_active_substance" rows="5" placeholder="Describe the active substance, pharmacological class, and mode of action..."></textarea>
+      </div>
+
+      <div>
+        <label style="font-weight:bold;">A3.2 Plausibility of the orphan condition</label>
+        <div class="hint">Provide data with the specific product as applied for designation in specific models or in patients affected by the condition.</div>
+        <textarea name="a3_2_plausibility" rows="6" placeholder="Describe the plausibility data — preclinical models, clinical data, or case reports supporting the orphan condition..."></textarea>
+      </div>
+
+      <div class="attachment-block" style="margin-top:14px;">
+        <label>A3 Supporting attachment (optional)</label>
+        <div class="hint">Upload any supporting document for the plausibility statement.</div>
+        <input type="file" name="a3_attachment">
+        <div style="margin-top:8px;">
+          <label style="font-weight:normal; font-size:13px;">Brief description of attachment:</label>
+          <input type="text" name="a3_attachment_desc" placeholder="e.g. Phase I study report, preclinical model summary...">
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>A4. Justification of the life-threatening or debilitating nature of the condition <span style="color:#b00;">*</span></label>
+      <div class="hint">Explain why the condition is considered life-threatening or chronically debilitating.</div>
+      <textarea name="a4_justification" rows="6" placeholder="Describe the severity and impact of the condition on patients' lives, survival, or daily functioning..."></textarea>
+    </div>
+
+    <div class="attachment-block">
+      <label>Section A &mdash; Additional attachments</label>
+      <div class="hint">Upload any additional supporting documents relevant to Section A.</div>
+      <input type="file" name="sectionA_attachment_1">
+      <div style="margin-top:8px;">
+        <label style="font-weight:normal; font-size:13px;">Brief description of attachment:</label>
+        <input type="text" name="sectionA_attachment_1_desc" placeholder="Describe this document...">
+      </div>
+      <div style="margin-top:10px;">
+        <input type="file" name="sectionA_attachment_2">
+        <div style="margin-top:8px;">
+          <label style="font-weight:normal; font-size:13px;">Brief description of attachment:</label>
+          <input type="text" name="sectionA_attachment_2_desc" placeholder="Describe this document...">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================== SECTION B ======================== -->
+  <div class="section-card">
+    <h3>Section B &mdash; Prevalence of the Condition</h3>
+
+    <div class="field">
+      <label>B1. Estimated prevalence in the EU / UK <span style="color:#b00;">*</span></label>
+      <div class="hint">Provide prevalence estimates with references. A condition is considered rare if it affects fewer than 5 in 10,000 persons.</div>
+      <textarea name="b1_prevalence" rows="5" placeholder="Provide estimated prevalence figures, data sources, and methodology used..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>B2. Source and methodology</label>
+      <div class="hint">Describe the data sources (registries, published epidemiological studies, etc.) used to estimate prevalence.</div>
+      <textarea name="b2_methodology" rows="4" placeholder="Describe the epidemiological data sources and estimation methodology..."></textarea>
+    </div>
+
+    <div class="attachment-block">
+      <label>Section B &mdash; Supporting attachments</label>
+      <input type="file" name="sectionB_attachment_1">
+      <div style="margin-top:8px;">
+        <label style="font-weight:normal; font-size:13px;">Brief description of attachment:</label>
+        <input type="text" name="sectionB_attachment_1_desc" placeholder="e.g. Epidemiological study, patient registry report...">
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================== SECTION C ======================== -->
+  <div class="section-card">
+    <h3>Section C &mdash; Potential for Return on Investment</h3>
+
+    <div class="field">
+      <label>C1. Justification that without incentives sufficient return on investment is unlikely <span style="color:#b00;">*</span></label>
+      <div class="hint">Explain why the development costs are unlikely to be recovered through sales in the rare condition market alone.</div>
+      <textarea name="c1_roi_justification" rows="6" placeholder="Describe the development cost estimates, expected market size, and justification that the investment would not be recouped without orphan incentives..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>C2. Development cost estimates</label>
+      <textarea name="c2_dev_costs" rows="4" placeholder="Provide estimated costs for clinical development (R&D, trials, regulatory submission, etc.)..."></textarea>
+    </div>
+
+    <div class="attachment-block">
+      <label>Section C &mdash; Supporting attachments</label>
+      <input type="file" name="sectionC_attachment_1">
+      <div style="margin-top:8px;">
+        <label style="font-weight:normal; font-size:13px;">Brief description of attachment:</label>
+        <input type="text" name="sectionC_attachment_1_desc" placeholder="e.g. Market analysis, financial projections...">
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================== SECTION D ======================== -->
+  <div class="section-card">
+    <h3>Section D &mdash; Other Methods / Existing Treatments</h3>
+
+    <div class="field">
+      <label>D1. Existing authorised treatments <span style="color:#b00;">*</span></label>
+      <div class="hint">List any currently authorised medicinal products or methods for the diagnosis, prevention, or treatment of the condition.</div>
+      <textarea name="d1_existing_treatments" rows="5" placeholder="List authorised treatments (or state 'None'), with their marketing authorisation holder and indication..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>D2. Significant benefit over existing methods</label>
+      <div class="hint">If authorised treatments exist, explain how your product offers a significant benefit to patients affected by the condition.</div>
+      <textarea name="d2_significant_benefit" rows="5" placeholder="Describe the significant benefit — improved efficacy, safety, convenience, or targeting a sub-population not adequately treated..."></textarea>
+    </div>
+
+    <div class="attachment-block">
+      <label>Section D &mdash; Supporting attachments</label>
+      <input type="file" name="sectionD_attachment_1">
+      <div style="margin-top:8px;">
+        <label style="font-weight:normal; font-size:13px;">Brief description of attachment:</label>
+        <input type="text" name="sectionD_attachment_1_desc" placeholder="e.g. Comparative efficacy data, clinical study report...">
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================== SECTION E ======================== -->
+  <div class="section-card">
+    <h3>Section E &mdash; Description of Stage of Development</h3>
+
+    <div class="field">
+      <label>E1. Current stage of development <span style="color:#b00;">*</span></label>
+      <div class="hint">Describe the current state of development of the medicinal product for the proposed indication.</div>
+      <textarea name="e1_stage" rows="5" placeholder="Describe the development stage (e.g. preclinical, Phase I, Phase II), ongoing or planned studies, and timelines..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>E2. Development plan summary</label>
+      <div class="hint">Provide a brief summary of the planned clinical development programme.</div>
+      <textarea name="e2_dev_plan" rows="5" placeholder="Outline planned clinical trials, endpoints, and estimated regulatory submission timeline..."></textarea>
+    </div>
+
+    <div class="attachment-block">
+      <label>Section E &mdash; Supporting attachments</label>
+      <input type="file" name="sectionE_attachment_1">
+      <div style="margin-top:8px;">
+        <label style="font-weight:normal; font-size:13px;">Brief description of attachment:</label>
+        <input type="text" name="sectionE_attachment_1_desc" placeholder="e.g. Development plan document, IND/CTA summary...">
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================== SECTION F ======================== -->
+  <div class="section-card">
+    <h3>Section F &mdash; Bibliography</h3>
+
+    <div class="field">
+      <label>F1. References <span style="color:#b00;">*</span></label>
+      <div class="hint">List all references cited in this application. Use a standard citation format (e.g. Vancouver or Harvard).</div>
+      <textarea name="f1_references" rows="10" placeholder="1. Author A, Author B. Title of study. Journal Name. Year;Vol(Issue):Pages.&#10;2. ..."></textarea>
+    </div>
+
+    <div class="attachment-block">
+      <label>Section F &mdash; Literature attachments</label>
+      <div class="hint">Upload key published papers or reports referenced in the bibliography.</div>
+      <input type="file" name="sectionF_attachment_1">
+      <div style="margin-top:8px;">
+        <label style="font-weight:normal; font-size:13px;">Brief description of attachment:</label>
+        <input type="text" name="sectionF_attachment_1_desc" placeholder="e.g. Key pivotal publication, systematic review...">
+      </div>
+      <div style="margin-top:10px;">
+        <input type="file" name="sectionF_attachment_2">
+        <div style="margin-top:8px;">
+          <label style="font-weight:normal; font-size:13px;">Brief description of attachment:</label>
+          <input type="text" name="sectionF_attachment_2_desc" placeholder="Describe this document...">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================== SUBMIT ======================== -->
+  <div class="section-card" style="background:#fdf8f8;">
+    <h3>Declaration and Submission</h3>
+    <div class="field">
+      <label>
+        <input type="checkbox" name="declaration" required style="margin-right:8px;">
+        I confirm that the information provided in this application is accurate and complete to the best of my knowledge.
+      </label>
+    </div>
+    <div class="form-actions">
+      <a href="/" style="margin-right:20px; color:#8b1111;">Cancel</a>
+      <button type="submit">Submit Application</button>
+    </div>
+  </div>
+
+</form>
+{% endif %}
+{% endblock %}

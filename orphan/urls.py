@@ -9,4 +9,7 @@ urlpatterns = [
     path("orphan/detail/<int:orphan_id>/", views.page2_detail, name="detail"),
     path("smpc/", views.smpc_list, name="smpc_list"),
     path("smpc/<int:smpc_id>/", views.smpc_detail, name="smpc_detail"),
+    path("login/", views.login_view, name="login"),
+    path("logout/", views.logout_view, name="logout"),
+    path("od/apply/", views.od_apply, name="od_apply"),
 ]
