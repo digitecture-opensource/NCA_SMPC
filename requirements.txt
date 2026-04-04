@@ -2,6 +2,7 @@ Django>=5.2,<5.3
 gunicorn
 whitenoise
 pyodbc
+mssql-django
 azure-identity
 sqlalchemy
 pandas

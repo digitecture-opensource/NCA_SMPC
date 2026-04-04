@@ -74,8 +74,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
 
-# --- Django DB on Azure SQL using Entra token backend. This is not in use for now---
-"""DATABASES = {
+# Django DB — Azure SQL via Entra token. Used for auth (auth_user already exists in SQL Server).
+DATABASES = {
     "default": {
         "ENGINE": "config.db_backends.sqlserver_aad",
         "NAME": os.getenv("DB_IDMP_DATABASE"),
@@ -84,16 +84,6 @@ LOGIN_REDIRECT_URL = "/"
             "driver": os.getenv("DRIVER", "ODBC Driver 18 for SQL Server"),
             "extra_params": "Connection Timeout=30;",
         },
-    }
-}"""
-
-
-
-# We are NOT using Django DB for app logic (only reading via SQLAlchemy)
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
