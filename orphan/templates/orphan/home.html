@@ -1,40 +1,6 @@
 {% extends "orphan/base.html" %}
 {% block title %}Regulatory Data Portal — Home{% endblock %}
 
-{% block extra_head %}
-<style>
-  .diagram-col-box {
-    border: 2px solid #1a6b4a;
-    border-radius: 10px;
-    padding: 8px 12px;
-    font-weight: bold;
-    font-size: 13px;
-    color: #1a6b4a;
-    background: #fff;
-    text-align: center;
-    text-decoration: none;
-    display: block;
-    transition: background 0.15s, color 0.15s;
-  }
-  .diagram-col-box:hover { background: #1a6b4a; color: #fff; }
-  .diagram-col ul {
-    text-align: left;
-    font-size: 12.5px;
-    color: #444;
-    line-height: 1.65;
-    padding-left: 16px;
-    margin: 10px 0 0;
-    width: 100%;
-  }
-  .diagram-col ul li { margin-bottom: 4px; }
-  .diagram-cols {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 16px;
-    margin-top: 0;
-  }
-  .diagram-col { display: flex; flex-direction: column; align-items: center; }
-</style>
 {% endblock %}
 
 {% block content %}
@@ -61,44 +27,70 @@
 
 <div class=”card”>
   <h3 style=”color:#1a6b4a; text-align:center; margin-top:0; margin-bottom:4px;”>What can you unlock by digitising your data?</h3>
-  <p style=”text-align:center; color:#666; font-size:13px; margin-bottom:16px;”>
+  <p style=”text-align:center; color:#666; font-size:13px; margin-bottom:20px;”>
     Digitising your SMPCs is the first step. Once your data is structured, a cascade of regulatory improvements becomes possible.
   </p>
 
-  <!-- SVG connector tree: root → 4 branches -->
-  <svg width=”100%” height=”90” viewBox=”0 0 800 90” preserveAspectRatio=”xMidYMid meet” style=”display:block; overflow:visible;”>
-    <!-- Root box -->
-    <rect x=”275” y=”4” width=”250” height=”36” rx=”9” ry=”9” fill=”white” stroke=”#1a6b4a” stroke-width=”2”/>
-    <text x=”400” y=”27” text-anchor=”middle” font-family=”Arial,sans-serif” font-size=”14” font-weight=”bold” fill=”#1a6b4a”>Digitise your SMPCs</text>
+  <!-- Root box -->
+  <div style=”text-align:center;”>
+    <span style=”display:inline-block; border:2px solid #1a6b4a; border-radius:10px; padding:9px 36px; font-weight:bold; font-size:14px; color:#1a6b4a; background:#fff;”>
+      Digitise your SMPCs
+    </span>
+  </div>
 
-    <!-- Vertical stem down from root -->
-    <line x1=”400” y1=”40” x2=”400” y2=”58” stroke=”#1a6b4a” stroke-width=”2”/>
+  <!-- Connector: vertical stem then horizontal bar with 4 drops -->
+  <!-- Uses a table so the geometry is browser-guaranteed -->
+  <table style=”width:100%; border-collapse:collapse; table-layout:fixed; margin:0;”>
+    <tr>
+      <!-- vertical stem: only centre two cells carry a bottom border meeting the horizontal bar -->
+      <td style=”width:12.5%; height:18px;”></td>
+      <td style=”width:12.5%; height:18px; border-bottom:2px solid #1a6b4a;”></td>
+      <td style=”width:25%;  height:18px; border-bottom:2px solid #1a6b4a; text-align:center; vertical-align:bottom; padding:0;”>
+        <!-- stem from root to horizontal bar -->
+        <div style=”width:2px; height:18px; background:#1a6b4a; margin:0 auto;”></div>
+      </td>
+      <td style=”width:25%;  height:18px; border-bottom:2px solid #1a6b4a;”></td>
+      <td style=”width:12.5%; height:18px; border-bottom:2px solid #1a6b4a;”></td>
+      <td style=”width:12.5%; height:18px;”></td>
+    </tr>
+    <tr>
+      <!-- drops down from horizontal bar to each of the 4 column boxes -->
+      <td style=”height:18px;”></td>
+      <td style=”height:18px; text-align:center; vertical-align:top; padding:0;”>
+        <div style=”width:2px; height:18px; background:#1a6b4a; margin:0 auto;”></div>
+      </td>
+      <td style=”height:18px; text-align:center; vertical-align:top; padding:0;”>
+        <div style=”width:2px; height:18px; background:#1a6b4a; margin:0 auto;”></div>
+      </td>
+      <td style=”height:18px; text-align:center; vertical-align:top; padding:0;”>
+        <div style=”width:2px; height:18px; background:#1a6b4a; margin:0 auto;”></div>
+      </td>
+      <td style=”height:18px; text-align:center; vertical-align:top; padding:0;”>
+        <div style=”width:2px; height:18px; background:#1a6b4a; margin:0 auto;”></div>
+      </td>
+      <td style=”height:18px;”></td>
+    </tr>
+  </table>
 
-    <!-- Horizontal bar spanning col centres (100, 300, 500, 700) -->
-    <line x1=”100” y1=”58” x2=”700” y2=”58” stroke=”#1a6b4a” stroke-width=”2”/>
+  <!-- Four column boxes and bullets -->
+  <div style=”display:flex; gap:16px; align-items:flex-start;”>
 
-    <!-- Vertical drops to each column header -->
-    <line x1=”100” y1=”58” x2=”100” y2=”82” stroke=”#1a6b4a” stroke-width=”2”/>
-    <line x1=”300” y1=”58” x2=”300” y2=”82” stroke=”#1a6b4a” stroke-width=”2”/>
-    <line x1=”500” y1=”58” x2=”500” y2=”82” stroke=”#1a6b4a” stroke-width=”2”/>
-    <line x1=”700” y1=”58” x2=”700” y2=”82” stroke=”#1a6b4a” stroke-width=”2”/>
-  </svg>
-
-  <!-- Four column header boxes + bullets -->
-  <div class=”diagram-cols”>
-
-    <div class=”diagram-col”>
-      <a class=”diagram-col-box” href=”#section-smpc”>First version of ePI</a>
-      <ul>
+    <div style=”flex:1; display:flex; flex-direction:column; align-items:center;”>
+      <a href=”#section-smpc” style=”display:block; width:100%; text-align:center; border:2px solid #1a6b4a; border-radius:10px; padding:8px 10px; font-weight:bold; font-size:13px; color:#1a6b4a; background:#fff; text-decoration:none; box-sizing:border-box;”>
+        First version of ePI
+      </a>
+      <ul style=”font-size:12.5px; color:#444; line-height:1.65; padding-left:18px; margin:10px 0 0; width:100%;”>
         <li>Day 1 benefit: first step toward electronic Patient Information (ePI)</li>
         <li>Reinforce regulator’s image as a trustworthy, collaborative provider of medicinal product data</li>
         <li>Drive transparency and improved patient and healthcare engagement</li>
       </ul>
     </div>
 
-    <div class=”diagram-col”>
-      <a class=”diagram-col-box” href=”#section-idmp”>Baseline IDMP Dataset</a>
-      <ul>
+    <div style=”flex:1; display:flex; flex-direction:column; align-items:center;”>
+      <a href=”#section-idmp” style=”display:block; width:100%; text-align:center; border:2px solid #1a6b4a; border-radius:10px; padding:8px 10px; font-weight:bold; font-size:13px; color:#1a6b4a; background:#fff; text-decoration:none; box-sizing:border-box;”>
+        Baseline IDMP Dataset
+      </a>
+      <ul style=”font-size:12.5px; color:#444; line-height:1.65; padding-left:18px; margin:10px 0 0; width:100%;”>
         <li>First step towards IDMP transformation</li>
         <li>Surface core three datasets in an IDMP-compliant structure</li>
         <li>Get ready for PhPID ingestion</li>
@@ -106,9 +98,11 @@
       </ul>
     </div>
 
-    <div class=”diagram-col”>
-      <a class=”diagram-col-box” href=”#section-orphan”>Digitise your Orphan Designation journey</a>
-      <ul>
+    <div style=”flex:1; display:flex; flex-direction:column; align-items:center;”>
+      <a href=”#section-orphan” style=”display:block; width:100%; text-align:center; border:2px solid #1a6b4a; border-radius:10px; padding:8px 10px; font-weight:bold; font-size:13px; color:#1a6b4a; background:#fff; text-decoration:none; box-sizing:border-box;”>
+        Digitise your Orphan Designation journey
+      </a>
+      <ul style=”font-size:12.5px; color:#444; line-height:1.65; padding-left:18px; margin:10px 0 0; width:100%;”>
         <li>Encourage pharma companies to develop drugs for rare diseases</li>
         <li>More transparency on the process and journey for patients</li>
         <li>Enable transparency on exclusivity and review dates</li>
@@ -116,9 +110,11 @@
       </ul>
     </div>
 
-    <div class=”diagram-col”>
-      <span class=”diagram-col-box”>Digitise your procedural steps</span>
-      <ul>
+    <div style=”flex:1; display:flex; flex-direction:column; align-items:center;”>
+      <span style=”display:block; width:100%; text-align:center; border:2px solid #1a6b4a; border-radius:10px; padding:8px 10px; font-weight:bold; font-size:13px; color:#1a6b4a; background:#fff; box-sizing:border-box;”>
+        Digitise your procedural steps
+      </span>
+      <ul style=”font-size:12.5px; color:#444; line-height:1.65; padding-left:18px; margin:10px 0 0; width:100%;”>
         <li>Build digital tools to raise questions and seek clarifications online</li>
         <li>Deprecate Word documents and PDFs while retaining ability to generate them for eCTD compliance</li>
         <li>Get ready to embrace cloud-based regulatory systems via APIs — adapt, not adopt</li>
