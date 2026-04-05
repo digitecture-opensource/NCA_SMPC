@@ -1,6 +1,7 @@
 import os
 import struct
 import pyodbc
+from datetime import datetime, timezone, timedelta
 from azure.identity import ClientSecretCredential, DefaultAzureCredential
 from mssql.base import DatabaseWrapper as MSSQLDatabaseWrapper
 
@@ -59,4 +60,17 @@ class DatabaseWrapper(MSSQLDatabaseWrapper):
 
         tok = _access_token_struct()
         print(">>> Using Entra token auth for Django DB connection")
-        return pyodbc.connect(conn_str, attrs_before={SQL_COPT_SS_ACCESS_TOKEN: tok})
+        conn = pyodbc.connect(conn_str, attrs_before={SQL_COPT_SS_ACCESS_TOKEN: tok})
+
+        # datetimeoffset (ODBC type -155) is not handled by mssql-django.
+        # Convert it to a Python datetime with UTC offset.
+        def _handle_datetimeoffset(dto_value):
+            # dto_value is a bytes object: YYYY-MM-DD HH:MM:SS.fffffff +HH:MM
+            tup = struct.unpack("<6hI2h", dto_value)
+            dt = datetime(tup[0], tup[1], tup[2], tup[3], tup[4], tup[5],
+                          tup[6] // 1000,
+                          tzinfo=timezone(timedelta(hours=tup[7], minutes=tup[8])))
+            return dt
+
+        conn.add_output_converter(-155, _handle_datetimeoffset)
+        return conn

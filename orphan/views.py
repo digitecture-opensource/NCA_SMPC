@@ -2,9 +2,79 @@ from django.shortcuts import render, redirect
 from django.http import Http404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .services import load_page1_df, load_page2_details, load_smpc_list_df, load_smpc_detail
+from .services import load_page1_df, load_page2_details, load_smpc_list_df, load_smpc_detail, load_idmp_product_master
 import logging
+import urllib.request
+import urllib.parse
+import json
 logger = logging.getLogger("orphan.views")
+
+
+def _fetch_fda_products(substance_name: str) -> list:
+    """Call OpenFDA drugsatfda endpoint and return a flat list of product dicts."""
+    if not substance_name:
+        return []
+    quoted = urllib.parse.quote(f'"{substance_name}"')
+    url = f"https://api.fda.gov/drug/drugsfda.json?search=products.active_ingredients.name:{quoted}&limit=10"
+    try:
+        with urllib.request.urlopen(url, timeout=5) as resp:
+            data = json.loads(resp.read())
+    except Exception as e:
+        logger.warning("FDA API call failed for %s: %s", substance_name, e)
+        return []
+
+    rows = []
+    for app in data.get("results", []):
+        app_number = app.get("application_number", "")
+        sponsor = app.get("sponsor_name", "")
+        openfda = app.get("openfda", {})
+
+        # Build submission list with docs
+        submissions = []
+        for sub in app.get("submissions", []):
+            docs = [
+                {"url": d.get("url", ""), "type": d.get("type", ""), "date": d.get("date", "")}
+                for d in sub.get("application_docs", [])
+                if d.get("url")
+            ]
+            submissions.append({
+                "type": sub.get("submission_type", ""),
+                "number": sub.get("submission_number", ""),
+                "status": sub.get("submission_status", ""),
+                "status_date": sub.get("submission_status_date", ""),
+                "class": sub.get("submission_class_code_description", ""),
+                "review_priority": sub.get("review_priority", ""),
+                "docs": docs,
+            })
+
+        for product in app.get("products", []):
+            ingredients = ", ".join(
+                i.get("name", "") for i in product.get("active_ingredients", [])
+            )
+            raw = {
+                "application_number": app_number,
+                "sponsor": sponsor,
+                "openfda": openfda,
+                "product": product,
+                "submissions": submissions,
+            }
+            rows.append({
+                "application_number": app_number,
+                "sponsor": sponsor,
+                "brand_name": product.get("brand_name", ""),
+                "dosage_form": product.get("dosage_form", ""),
+                "route": product.get("route", ""),
+                "strength": ", ".join(
+                    i.get("strength", "") for i in product.get("active_ingredients", [])
+                ),
+                "marketing_status": product.get("marketing_status", ""),
+                "active_ingredients": ingredients,
+                "pharm_class": ", ".join(openfda.get("pharm_class_epc", [])),
+                "generic_name": ", ".join(openfda.get("generic_name", [])),
+                "submissions": submissions,
+                "raw_json": json.dumps(raw, indent=2),
+            })
+    return rows
 
 
 
@@ -28,6 +98,29 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect("/")
+
+
+def idmp_product_master(request):
+    try:
+        ma_df, mp_df, ap_df = load_idmp_product_master()
+        ma_rows = ma_df.to_dict("records")
+        mp_rows = mp_df.to_dict("records")
+        ap_rows = ap_df.to_dict("records")
+        ma_cols = list(ma_df.columns)
+        mp_cols = list(mp_df.columns)
+        ap_cols = list(ap_df.columns)
+        error = None
+    except Exception as e:
+        logger.error("IDMP product master load failed: %s", e)
+        ma_rows = mp_rows = ap_rows = []
+        ma_cols = mp_cols = ap_cols = []
+        error = str(e)
+    return render(request, "orphan/idmp_product_master.html", {
+        "ma_rows": ma_rows, "ma_cols": ma_cols,
+        "mp_rows": mp_rows, "mp_cols": mp_cols,
+        "ap_rows": ap_rows, "ap_cols": ap_cols,
+        "error": error,
+    })
 
 
 @login_required
@@ -116,11 +209,16 @@ def page2_detail(request, orphan_id: int):
 
     smpc_url_toHTML = detail.get("SMPC_URL", "")
 
+    ema_substance = summary.get("ai_ema_substance", "")
+    fda_products = _fetch_fda_products(ema_substance)
+
     return render(request, "orphan/page2_detail.html", {
         "orphan_id": orphan_id,
         "summary": summary,
         "sections": sections,
         "smpc_url_toHTML": smpc_url_toHTML,
+        "fda_products": fda_products,
+        "fda_substance": ema_substance,
     })
 
 

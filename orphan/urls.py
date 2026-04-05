@@ -12,4 +12,5 @@ urlpatterns = [
     path("login/", views.login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),
     path("od/apply/", views.od_apply, name="od_apply"),
+    path("idmp/product-master/", views.idmp_product_master, name="idmp_product_master"),
 ]

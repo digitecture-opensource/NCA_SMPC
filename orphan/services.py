@@ -193,6 +193,102 @@ def load_smpc_detail(smpc_id: int) -> pd.DataFrame:
         return pd.read_sql_query(text(QUERY_SMPC_DETAIL), conn, params={"smpc_id": smpc_id})
 
 
+QUERY_IDMP_MA = """
+SELECT
+    ma.MA_sk,
+    ma.Authorisation_Number,
+    ma.First_Authorisation_Date,
+    ma.Authorisation_Status_denorm          AS Authorisation_Status,
+    ma.Authorisation_Status_Date,
+    ma.Procedure_Type_denorm                AS Procedure_Type,
+    ma.Procedure_Start_date,
+    ma.Procedure_End_date,
+    ma.Validity_Start_Date,
+    ma.Validity_End_Date,
+    ma.Current_flag
+FROM rim.MA_Marketing_Authorisation ma
+WHERE ma.Current_flag = 1
+ORDER BY ma.Authorisation_Number
+"""
+
+QUERY_IDMP_MP = """
+SELECT
+    mp.Med_Prod_sk,
+    mp.MPID,
+    mp.Internal_MPID,
+    mp.Jurisdiction_denorm                  AS Jurisdiction,
+    mp.Combined_dose_form_denorm            AS Combined_Dose_Form,
+    mp.Orphan_designation,
+    mp.Paediatric_use_indication_flag,
+    mp.Additional_monitoring_flag,
+    mpn.Full_Name,
+    mpn.Name_type_denorm                    AS Name_Type,
+    mpn.Is_Preferred,
+    mpn.Invented_Name_Part,
+    mpn.Scientific_Name_Part,
+    mpn.Strength_Part,
+    mpn.Pharmaceutical_Dose_Form_Part,
+    mpn.Country_Code,
+    mpn.Language_Code,
+    ma.Authorisation_Number,
+    ma.MA_sk
+FROM rim.Medicinal_Products mp
+INNER JOIN rim.MA_MP_Association assoc
+    ON assoc.Med_Prod_sk = mp.Med_Prod_sk
+   AND assoc.Current_flag = 1
+INNER JOIN rim.MA_Marketing_Authorisation ma
+    ON ma.MA_sk = assoc.MA_sk
+   AND ma.Current_flag = 1
+LEFT JOIN rim.Medicinal_Product_Names mpn
+    ON mpn.Med_Prod_sk = mp.Med_Prod_sk
+WHERE mp.Current_flag = 1
+ORDER BY mp.Med_Prod_sk, mpn.Is_Preferred DESC, mpn.Full_Name
+"""
+
+QUERY_IDMP_AP = """
+SELECT
+    ap.AdmProd_sk,
+    mp.Med_Prod_sk,
+    mp.MPID,
+    mp.Internal_MPID,
+    ma.Authorisation_Number,
+    ap.Dose_form_denorm                     AS Dose_Form,
+    ap.Unit_of_presentation_denorm          AS Unit_of_Presentation,
+    ap.Release_characteristics_denorm       AS Release_Characteristics,
+    STRING_AGG(roa.Route_denorm, '; ')
+        WITHIN GROUP (ORDER BY roa.Route_denorm) AS Routes,
+    ap.Current_flag,
+    ap.Validity_Start_Date
+FROM rim.Administrable_Product ap
+INNER JOIN rim.Medicinal_Products mp
+    ON mp.Med_Prod_sk = ap.Med_Prod_sk
+   AND mp.Current_flag = 1
+INNER JOIN rim.MA_MP_Association assoc
+    ON assoc.Med_Prod_sk = mp.Med_Prod_sk
+   AND assoc.Current_flag = 1
+INNER JOIN rim.MA_Marketing_Authorisation ma
+    ON ma.MA_sk = assoc.MA_sk
+   AND ma.Current_flag = 1
+LEFT JOIN rim.Route_of_Administration roa
+    ON roa.AdmProd_sk = ap.AdmProd_sk
+WHERE ap.Current_flag = 1
+GROUP BY
+    ap.AdmProd_sk, mp.Med_Prod_sk, mp.MPID, mp.Internal_MPID,
+    ma.Authorisation_Number,
+    ap.Dose_form_denorm, ap.Unit_of_presentation_denorm,
+    ap.Release_characteristics_denorm, ap.Current_flag, ap.Validity_Start_Date
+ORDER BY ma.Authorisation_Number, ap.AdmProd_sk
+"""
+
+
+def load_idmp_product_master() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    with get_engine().connect() as conn:
+        ma = pd.read_sql_query(text(QUERY_IDMP_MA), conn)
+        mp = pd.read_sql_query(text(QUERY_IDMP_MP), conn)
+        ap = pd.read_sql_query(text(QUERY_IDMP_AP), conn)
+    return ma, mp, ap
+
+
 def load_page2_details(orphan_id: int) -> tuple[pd.DataFrame, pd.DataFrame]:
     with get_engine().connect() as conn:
         a = pd.read_sql_query(text(QUERY_PAGE2_A), conn, params={"orphan_id": orphan_id})

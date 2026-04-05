@@ -1,0 +1,216 @@
+{% extends "orphan/base.html" %}
+{% load dict_filters %}
+{% block title %}IDMP Product Master — Regulatory Data Portal{% endblock %}
+{% block og_title %}IDMP Product Master Data — Marketing Authorisation, Medicinal Product & Administrable Product{% endblock %}
+{% block canonical %}https://www.regdata.info/idmp/product-master/{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* Shared table base */
+  .idmp-table-wrap {
+    overflow-x: auto;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    margin-bottom: 8px;
+  }
+  .idmp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .idmp-table td {
+    padding: 5px 10px;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    vertical-align: top;
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .idmp-table tr:last-child td { border-bottom: none; }
+
+  /* Marketing Authorisation — Green */
+  .ma-header { background: #1a6b35; color: #fff; }
+  .idmp-table.ma thead th {
+    background: #1a6b35; color: #fff;
+    padding: 6px 10px; text-align: left; font-size: 11px;
+    border-right: 1px solid rgba(255,255,255,0.15);
+  }
+  .idmp-table.ma tbody tr:nth-child(odd)  { background: #f0f8f2; }
+  .idmp-table.ma tbody tr:nth-child(even) { background: #e3f5e8; }
+  .idmp-table.ma tbody tr:hover { background: #c8ecd2; }
+
+  /* Medicinal Product — Yellow */
+  .mp-header { background: #7a6000; color: #fff; }
+  .idmp-table.mp thead th {
+    background: #7a6000; color: #fff;
+    padding: 6px 10px; text-align: left; font-size: 11px;
+    border-right: 1px solid rgba(255,255,255,0.15);
+  }
+  .idmp-table.mp tbody tr:nth-child(odd)  { background: #fefcee; }
+  .idmp-table.mp tbody tr:nth-child(even) { background: #fdf5c0; }
+  .idmp-table.mp tbody tr:hover { background: #f9ea80; }
+
+  /* Administrable Product — Amber */
+  .ap-header { background: #8a4a00; color: #fff; }
+  .idmp-table.ap thead th {
+    background: #8a4a00; color: #fff;
+    padding: 6px 10px; text-align: left; font-size: 11px;
+    border-right: 1px solid rgba(255,255,255,0.15);
+  }
+  .idmp-table.ap tbody tr:nth-child(odd)  { background: #fff8f0; }
+  .idmp-table.ap tbody tr:nth-child(even) { background: #fde8c8; }
+  .idmp-table.ap tbody tr:hover { background: #f9cc88; }
+
+  /* Section headers */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    border-radius: 4px 4px 0 0;
+    margin-bottom: 0;
+    color: #fff;
+    font-weight: bold;
+    font-size: 15px;
+  }
+  .section-header .row-count {
+    font-size: 12px;
+    font-weight: normal;
+    opacity: 0.85;
+    margin-left: auto;
+  }
+  .section-block { margin-bottom: 28px; }
+
+  /* Jump links */
+  .jump-links { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  .jump-link {
+    padding: 6px 16px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #fff;
+  }
+  .jump-link.ma { background: #1a6b35; }
+  .jump-link.mp { background: #7a6000; }
+  .jump-link.ap { background: #8a4a00; }
+  .jump-link:hover { opacity: 0.85; }
+
+  .idmp-meta {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 style="color:#8b1111;">IDMP Product Master</h2>
+
+<p class="idmp-meta">
+  This page presents the IDMP-aligned product hierarchy derived from the underlying regulatory dataset.
+  Three IDMP entity levels are shown: <strong style="color:#1a6b35;">Marketing Authorisation</strong>,
+  <strong style="color:#7a6000;">Medicinal Product</strong>, and
+  <strong style="color:#8a4a00;">Administrable Product</strong> — each colour-coded to reflect
+  its position in the ISO&nbsp;11615 / IDMP data model.
+</p>
+
+<div class="jump-links">
+  <a class="jump-link ma" href="#ma">Marketing Authorisation</a>
+  <a class="jump-link mp" href="#mp">Medicinal Product</a>
+  <a class="jump-link ap" href="#ap">Administrable Product</a>
+</div>
+
+{% if error %}
+  <div style="background:#fff0f0; border:1px solid #e8a0a0; border-radius:4px; padding:12px 16px; color:#8b1111; margin-bottom:20px;">
+    <strong>Data load error:</strong> {{ error }}
+  </div>
+{% endif %}
+
+<!-- ── Marketing Authorisation ──────────────────────── -->
+<div class="section-block" id="ma">
+  <div class="section-header ma-header">
+    Marketing Authorisation
+    <span class="row-count">{{ ma_rows|length }} record(s)</span>
+  </div>
+  <div class="idmp-table-wrap">
+    <table class="idmp-table ma">
+      <thead>
+        <tr>
+          {% for col in ma_cols %}<th>{{ col }}</th>{% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in ma_rows %}
+        <tr>
+          {% for col in ma_cols %}
+          <td title="{{ row|get_item:col }}">{{ row|get_item:col }}</td>
+          {% endfor %}
+        </tr>
+        {% empty %}
+        <tr><td colspan="{{ ma_cols|length }}" style="color:#999; text-align:center; padding:16px;">No records found</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── Medicinal Product ────────────────────────────── -->
+<div class="section-block" id="mp">
+  <div class="section-header mp-header">
+    Medicinal Product
+    <span class="row-count">{{ mp_rows|length }} record(s)</span>
+  </div>
+  <div class="idmp-table-wrap">
+    <table class="idmp-table mp">
+      <thead>
+        <tr>
+          {% for col in mp_cols %}<th>{{ col }}</th>{% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in mp_rows %}
+        <tr>
+          {% for col in mp_cols %}
+          <td title="{{ row|get_item:col }}">{{ row|get_item:col }}</td>
+          {% endfor %}
+        </tr>
+        {% empty %}
+        <tr><td colspan="{{ mp_cols|length }}" style="color:#999; text-align:center; padding:16px;">No records found</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── Administrable Product ────────────────────────── -->
+<div class="section-block" id="ap">
+  <div class="section-header ap-header">
+    Administrable Product
+    <span class="row-count">{{ ap_rows|length }} record(s)</span>
+  </div>
+  <div class="idmp-table-wrap">
+    <table class="idmp-table ap">
+      <thead>
+        <tr>
+          {% for col in ap_cols %}<th>{{ col }}</th>{% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in ap_rows %}
+        <tr>
+          {% for col in ap_cols %}
+          <td title="{{ row|get_item:col }}">{{ row|get_item:col }}</td>
+          {% endfor %}
+        </tr>
+        {% empty %}
+        <tr><td colspan="{{ ap_cols|length }}" style="color:#999; text-align:center; padding:16px;">No records found</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

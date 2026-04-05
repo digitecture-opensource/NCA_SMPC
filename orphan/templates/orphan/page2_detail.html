@@ -44,6 +44,83 @@
     max-height: 520px;
     overflow-y: auto;
   }
+
+  /* FDA modal */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: #fff;
+    border-radius: 6px;
+    padding: 28px 32px;
+    max-width: 860px;
+    width: 95%;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  }
+  .modal-close {
+    position: absolute; top: 14px; right: 18px;
+    font-size: 22px; cursor: pointer; color: #666; border: none; background: none;
+  }
+  .modal-close:hover { color: #8b1111; }
+  .modal-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .modal-table th, .modal-table td {
+    text-align: left;
+    padding: 6px 10px;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+  }
+  .modal-table th { width: 35%; color: #555; font-weight: normal; }
+  .modal-table td { color: #222; }
+  .modal-section-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #8b1111;
+    margin: 18px 0 8px;
+    border-bottom: 1px solid #f1e0e0;
+    padding-bottom: 4px;
+  }
+  .sub-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .sub-table th {
+    background: #f4f4f4;
+    padding: 5px 8px;
+    text-align: left;
+    border-bottom: 2px solid #e0e0e0;
+    font-size: 12px;
+  }
+  .sub-table td {
+    padding: 5px 8px;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+  }
+  .doc-link {
+    display: inline-block;
+    margin: 3px 6px 3px 0;
+    padding: 3px 10px;
+    border: 1px solid #8b1111;
+    border-radius: 12px;
+    font-size: 11px;
+    color: #8b1111;
+    text-decoration: none;
+  }
+  .doc-link:hover { background: #8b1111; color: #fff; }
 </style>
 <script>
   function showTab(id, btn) {
@@ -52,6 +129,18 @@
     document.getElementById(id).classList.add("visible");
     btn.classList.add("active");
   }
+
+  function openFdaModal(id) {
+    document.getElementById(id).classList.add("open");
+  }
+  function closeFdaModal(id) {
+    document.getElementById(id).classList.remove("open");
+  }
+  document.addEventListener("click", function(e) {
+    if (e.target.classList.contains("modal-overlay")) {
+      e.target.classList.remove("open");
+    }
+  });
 </script>
 {% endblock %}
 
@@ -119,6 +208,123 @@
         </details>
       </div>
     </div>
+  </div>
+
+  <div class="card">
+    <h3>FDA Approved Products &mdash; <em>{{ fda_substance }}</em></h3>
+    <p style="color:#555; font-size:13px; margin-top:-6px;">
+      Products approved by the FDA containing the matched EMA substance, sourced from
+      <a href="https://open.fda.gov/apis/drug/drugsfda/" target="_blank" rel="noopener">OpenFDA Drugs@FDA</a>.
+    </p>
+
+    {% if fda_products %}
+    <div style="overflow:auto;">
+      <table style="font-size:13px;">
+        <thead>
+          <tr>
+            <th>Application No.</th>
+            <th>Sponsor</th>
+            <th>Brand Name</th>
+            <th>Active Ingredient(s)</th>
+            <th>Strength</th>
+            <th>Dosage Form</th>
+            <th>Route</th>
+            <th>Marketing Status</th>
+            <th>Pharmacological Class</th>
+            <th>More Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in fda_products %}
+          <tr>
+            <td>{{ p.application_number }}</td>
+            <td>{{ p.sponsor }}</td>
+            <td>{{ p.brand_name }}</td>
+            <td>{{ p.active_ingredients }}</td>
+            <td>{{ p.strength }}</td>
+            <td>{{ p.dosage_form }}</td>
+            <td>{{ p.route }}</td>
+            <td>{{ p.marketing_status }}</td>
+            <td style="font-size:12px;">{{ p.pharm_class }}</td>
+            <td>
+              <button class="tab-btn" style="border-radius:4px; font-size:12px; padding:4px 10px;"
+                      onclick="openFdaModal('fda-modal-{{ forloop.counter }}')">View</button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- FDA detail modals -->
+    {% for p in fda_products %}
+    <div class="modal-overlay" id="fda-modal-{{ forloop.counter }}">
+      <div class="modal-box">
+        <button class="modal-close" onclick="closeFdaModal('fda-modal-{{ forloop.counter }}')">&times;</button>
+        <h3 style="color:#8b1111; margin-top:0;">{{ p.brand_name }} &mdash; {{ p.application_number }}</h3>
+
+        <div class="modal-section-title">Product Details</div>
+        <table class="modal-table">
+          <tr><th>Application No.</th><td>{{ p.application_number }}</td></tr>
+          <tr><th>Sponsor</th><td>{{ p.sponsor }}</td></tr>
+          <tr><th>Brand Name</th><td>{{ p.brand_name }}</td></tr>
+          <tr><th>Generic Name</th><td>{{ p.generic_name }}</td></tr>
+          <tr><th>Active Ingredient(s)</th><td>{{ p.active_ingredients }}</td></tr>
+          <tr><th>Strength</th><td>{{ p.strength }}</td></tr>
+          <tr><th>Dosage Form</th><td>{{ p.dosage_form }}</td></tr>
+          <tr><th>Route</th><td>{{ p.route }}</td></tr>
+          <tr><th>Marketing Status</th><td>{{ p.marketing_status }}</td></tr>
+          <tr><th>Pharmacological Class</th><td>{{ p.pharm_class }}</td></tr>
+        </table>
+
+        <div class="modal-section-title">Submissions ({{ p.submissions|length }})</div>
+        {% if p.submissions %}
+        <table class="sub-table">
+          <thead>
+            <tr>
+              <th>Type / No.</th>
+              <th>Class</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Review</th>
+              <th>Documents</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for sub in p.submissions %}
+            <tr>
+              <td>{{ sub.type }}-{{ sub.number }}</td>
+              <td>{{ sub.class }}</td>
+              <td>{{ sub.status }}</td>
+              <td>{{ sub.status_date }}</td>
+              <td>{{ sub.review_priority }}</td>
+              <td>
+                {% if sub.docs %}
+                  {% for doc in sub.docs %}
+                    <a class="doc-link" href="{{ doc.url }}" target="_blank" rel="noopener">
+                      {{ doc.type }}{% if doc.date %} ({{ doc.date }}){% endif %}
+                    </a>
+                  {% endfor %}
+                {% else %}
+                  <span style="color:#aaa;">—</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+          <p style="color:#aaa; font-size:13px;">No submissions available.</p>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+
+    {% elif fda_substance %}
+      <p style="color:#666;">No FDA-approved products found for <strong>{{ fda_substance }}</strong>.</p>
+    {% else %}
+      <p style="color:#666;">No EMA substance match available — FDA lookup skipped.</p>
+    {% endif %}
   </div>
 
   <div class="card">
