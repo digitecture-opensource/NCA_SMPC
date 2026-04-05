@@ -21,10 +21,60 @@
     <li>Showcases that a lot is possible with even the datasets regulators currently hold</li>
     <li>Makes a strong, compelling case for stronger collaboration with regulators</li>
   </ul>
+  <b>Disclaimers: </b>
+  <ul>
+    <li>The baseline data for this micro-site is sourced from MHRA's <a href="https://products.mhra.gov.uk/" target="_blank">product portal</a>. Hence the subdomain is dedicated to MHRA</li>
+    <li>The Substances data for this micro-site is sourced from EMA's <a href="https://spor.ema.europa.eu/web-ui-data-backend/download/csv" target="_blank">SPOR product portal</a></li>
+    <li>The portal also demonstrates ability to use  <a href="https://open.fda.gov/apis/" target="_blank">OpenFDA APIs</a></li>
+       
+  </ul>
 </div>
 
 <h3 style="margin-top:30px;">Sections of this Micro-App</h3>
 
+<div class="card">
+  <h3 style="color:#8b1111; margin-top:0;"><a href="/smpc/" style="color:#8b1111;">Digitised SMPC</a></h3>
+  <p>
+    The SMPC (Summary of Product Characteristics) is a structured document. If the sections of the PDF are extracted
+    into a database, the utility of the data increases manifold. The FDA offers APIs under its OpenFDA framework, but
+    other regulators struggle to offer a similar service. This is essantially the first version of ePI (electronic Product Information) 
+    that the regulator could offer to the public, healthcare professionals and hospitals.
+  </p>
+  <p>
+    This service takes approximately 400 SMPCs, digitises them, and makes them available as a searchable public portal —
+    demonstrating how regulators could easily make their existing document libraries far more accessible and useful.
+  </p>
+  <b> Day 1 Benefits </b>
+  <ul>
+    <li>First step toward electronic Patient Information (ePI) </li>
+    <li>Reinforce regulator’s image as trustable, collaborative provider of Medicinal product data</li>
+    <li>Drive transparency and improved patient and Healthcare engagement</li>
+  </ul>
+  <a href="/smpc/" style="color:#8b1111; font-weight:bold;">Browse SMPC Listing &rarr;</a>
+</div>
+<div class="card">
+  <h3 style="color:#8b1111; margin-top:0;"><a href="/idmp/product-master/" style="color:#8b1111;">IDMP Product Master</a></h3>
+  <p>
+    One of the core challenges regulators face is that their existing datasets were not built with IDMP in mind.
+    This section demonstrates how data already held in a regulatory system can be restructured and surfaced in
+    an IDMP-aligned hierarchy — <strong>Marketing Authorisation → Medicinal Product → Administrable Product</strong> —
+    without replacing the underlying source systems.
+  </p>
+  <p>
+    This is a key proof point: regulators do not need to start from scratch to achieve IDMP compliance.
+    With appropriate transformation tooling, existing data can be mapped to ISO&nbsp;11615 / ISO&nbsp;11616
+    structures incrementally.
+
+  </p>
+  <b> Strategic Benefits </b>
+  <ul>
+    <li>Intitiate your IDMP transformation.  </li>
+    <li>Strong foundation to surface core three datasets in IDMP compliant structure</li>
+    <li>Get ready for PhpId ingestion </li>
+    <li>All Pharmacovigilance use cases can be satisfied with this dataset. </li>
+  </ul>
+  <a href="/idmp/product-master/" style="color:#8b1111; font-weight:bold;">Browse IDMP Product Master &rarr;</a>
+</div>
 <div class="card">
   <h3 style="color:#8b1111; margin-top:0;"><a href="/orphan/" style="color:#8b1111;">Orphan Designations</a></h3>
   <p>
@@ -34,31 +84,20 @@
   </p>
   <p>
     Orphan Designation review is usually undertaken as a mini-process running in parallel with the Marketing Authorisation.
-    The regulator could offer a simple portal that:
+    Availability of structured data on SMPC can enable end to end automation of the Orphan Designation process. The process is desgined with regulators in mind. 
   </p>
+  <b> Drive Innovation</b>
   <ul>
-    <li>Allows companies to request Orphan Designation via a secure portal</li>
+    <li>Allows companies to request Orphan Designation via a secure portal providing encouragement for pharma companies to launch orphan drugs</li>
     <li>Provides a simple internal workflow for review and assessment</li>
-    <li>Offers document exchange to support the application</li>
-    <li>Once approved, automatically pushes data into the table exposed on the public portal</li>
-    <li>Keeps all other datasets in the same environment but protected under a secure zone controlled using industry-standard RBAC</li>
+    <li>Enable transparency on Exclusivity dates and review dates for products with orphan designation. </li>
+    <li>Make your country a better place to do business with.  
+</li>
   </ul>
   <a href="/orphan/" style="color:#8b1111; font-weight:bold;">Browse Orphan Designations &rarr;</a>
 </div>
 
-<div class="card">
-  <h3 style="color:#8b1111; margin-top:0;"><a href="/smpc/" style="color:#8b1111;">Digitised SMPC</a></h3>
-  <p>
-    The SMPC (Summary of Product Characteristics) is a structured document. If the sections of the PDF are extracted
-    into a database, the utility of the data increases manifold. The FDA offers APIs under its OpenFDA framework, but
-    other regulators struggle to offer a similar service.
-  </p>
-  <p>
-    This service takes approximately 400 SMPCs, digitises them, and makes them available as a searchable public portal —
-    demonstrating how regulators could easily make their existing document libraries far more accessible and useful.
-  </p>
-  <a href="/smpc/" style="color:#8b1111; font-weight:bold;">Browse SMPC Listing &rarr;</a>
-</div>
+
 
 <div class="card">
   <h3 style="color:#8b1111; margin-top:0;"><a href="/od/apply/" style="color:#8b1111;">Request Orphan Designation</a></h3>
@@ -78,19 +117,32 @@
   <a href="/od/apply/" style="color:#8b1111; font-weight:bold;">Start Orphan Designation Application &rarr;</a>
 </div>
 
+
 <div class="card">
-  <h3 style="color:#8b1111; margin-top:0;"><a href="/idmp/product-master/" style="color:#8b1111;">IDMP Product Master</a></h3>
+  <h3 style="color:#8b1111; margin-top:0;"><a href="/orphan/" style="color:#8b1111;">Digitise your procedural steps </a></h3>
   <p>
-    One of the core challenges regulators face is that their existing datasets were not built with IDMP in mind.
-    This section demonstrates how data already held in a regulatory system can be restructured and surfaced in
-    an IDMP-aligned hierarchy — <strong>Marketing Authorisation → Medicinal Product → Administrable Product</strong> —
-    without replacing the underlying source systems.
+    Baseline IDMP dataset would allow regulators to digitise the procedural steps for processing any Marketing Authorisation application. 
+    Information and dataset published in the IDMP view above is classified as "public" information and can be safely used as basis to enable 
+    online jounry to request "more information" (RFIs) or "request correction of data" (called VCRs in the UK). the journey can be deisgned to refernce specific eCTD sections
+    or document names against which clarification is being sought. 
+
+    
+    
   </p>
   <p>
-    This is a key proof point: regulators do not need to start from scratch to achieve IDMP compliance.
-    With appropriate transformation tooling, existing data can be mapped to ISO&nbsp;11615 / ISO&nbsp;11616
-    structures incrementally.
-  </p>
-  <a href="/idmp/product-master/" style="color:#8b1111; font-weight:bold;">Browse IDMP Product Master &rarr;</a>
+        This would allow regulators to move away from email-based communication and manual processing of RFIs and VCRs, 
+    and instead have a fully digitised, auditable workflow for these procedural steps.  </p>
+  <b> Improve Regulatory Efficiency</b>
+  <ul>
+    <li>User frield </li>
+    <li>Provides a simple internal workflow for review and assessment</li>
+    <li>Eradicate dependence on Word documents and pdfs but still retain ability to generate one and add them to your eCTD sequence for compliance and lifecycle management </li>
+    <li>Get ready to embrace “Cloud Based Regulatory Systems” by enabling APIs that allow you to adapt them and not force you to Adopt one </li>
+  </ul>
+  <a href="/orphan/" style="color:#8b1111; font-weight:bold;">Browse Orphan Designations &rarr;</a>
 </div>
+
+
+
+
 {% endblock %}
