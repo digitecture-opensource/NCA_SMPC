@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import Http404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .services import load_page1_df, load_page2_details, load_smpc_list_df, load_smpc_detail, load_idmp_product_master
+from .services import load_page1_df, load_page2_details, load_smpc_list_df, load_smpc_detail, load_idmp_product_master, load_idmp_for_orphan
 import logging
 import urllib.request
 import urllib.parse
@@ -212,6 +212,15 @@ def page2_detail(request, orphan_id: int):
     ema_substance = summary.get("ai_ema_substance", "")
     fda_products = _fetch_fda_products(ema_substance)
 
+    try:
+        idmp_ma_df, idmp_mp_df, idmp_ap_df = load_idmp_for_orphan(orphan_id)
+        idmp_ma = idmp_ma_df.fillna("").to_dict("records")
+        idmp_mp = idmp_mp_df.fillna("").to_dict("records")
+        idmp_ap = idmp_ap_df.fillna("").to_dict("records")
+    except Exception as e:
+        logger.warning("IDMP load failed for orphan %s: %s", orphan_id, e)
+        idmp_ma = idmp_mp = idmp_ap = []
+
     return render(request, "orphan/page2_detail.html", {
         "orphan_id": orphan_id,
         "summary": summary,
@@ -219,6 +228,9 @@ def page2_detail(request, orphan_id: int):
         "smpc_url_toHTML": smpc_url_toHTML,
         "fda_products": fda_products,
         "fda_substance": ema_substance,
+        "idmp_ma": idmp_ma,
+        "idmp_mp": idmp_mp,
+        "idmp_ap": idmp_ap,
     })
 
 

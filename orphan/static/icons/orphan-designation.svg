@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Orphan designation journey icon">
+  <defs>
+    <style>
+      .heart{fill:#0b7a6e}
+      .star{fill:#f2c94c;stroke:#d8a800;stroke-width:2}
+    </style>
+  </defs>
+  <path class="heart" d="M64 101C32 81 22 62 22 45c0-13 10-23 23-23 9 0 15 5 19 12 4-7 10-12 19-12 13 0 23 10 23 23 0 17-10 36-42 56z"/>
+  <path class="star" d="M92 43l5.6 11.4 12.6 1.8-9.1 8.9 2.2 12.5L92 71.7 80.7 77.6l2.2-12.5-9.1-8.9 12.6-1.8z"/>
+</svg>

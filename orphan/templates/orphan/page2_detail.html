@@ -45,6 +45,115 @@
     overflow-y: auto;
   }
 
+  /* IDMP View section */
+  .idmp-band {
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin-bottom: 18px;
+  }
+  .idmp-band-title {
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .idmp-band-title .idmp-count {
+    font-size: 11px;
+    font-weight: normal;
+    opacity: 0.7;
+    text-transform: none;
+  }
+  /* Green — MA */
+  .idmp-ma { background: #edf7f0; border: 1px solid #b2dbc0; }
+  .idmp-ma .idmp-band-title { color: #1a6b35; }
+  .idmp-ma .idmp-kv-label { color: #2e7d52; }
+  .idmp-ma .idmp-badge-active { background: #1a6b35; color: #fff; }
+  /* Yellow — MP */
+  .idmp-mp { background: #fefce8; border: 1px solid #e0d080; }
+  .idmp-mp .idmp-band-title { color: #7a6000; }
+  .idmp-mp .idmp-kv-label { color: #7a6000; }
+  .idmp-mp .idmp-flag { background: #fde74c; color: #5a4500; border: 1px solid #c8b800; }
+  /* Amber — AP */
+  .idmp-ap { background: #fff8ee; border: 1px solid #f0c88a; }
+  .idmp-ap .idmp-band-title { color: #8a4a00; }
+  .idmp-ap .idmp-kv-label { color: #8a4a00; }
+  .idmp-ap .idmp-route-pill { background: #f5ddb0; color: #6b3800; border: 1px solid #d9a060; }
+
+  .idmp-kv-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px 20px;
+  }
+  .idmp-kv-label {
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 2px;
+  }
+  .idmp-kv-value { font-size: 13px; color: #222; }
+  .idmp-badge-active {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  .idmp-badge-inactive {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    background: #e0e0e0;
+    color: #666;
+  }
+  .idmp-flag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    margin: 2px 4px 2px 0;
+  }
+  .idmp-route-pill {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin: 2px 4px 2px 0;
+  }
+  .idmp-mp-card {
+    background: #fffef5;
+    border: 1px solid #e0d080;
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+  .idmp-mp-name { font-size: 15px; font-weight: bold; color: #5a4500; margin-bottom: 6px; }
+  .idmp-mp-name-pill {
+    display: inline-block;
+    background: #fdf3b0;
+    border: 1px solid #d0b800;
+    border-radius: 10px;
+    font-size: 11px;
+    padding: 1px 8px;
+    margin: 2px 4px 2px 0;
+    color: #5a4500;
+  }
+  .idmp-ap-cards { display: flex; flex-wrap: wrap; gap: 12px; }
+  .idmp-ap-card {
+    background: #fffaf3;
+    border: 1px solid #f0c88a;
+    border-radius: 6px;
+    padding: 12px 16px;
+    min-width: 220px;
+    flex: 1;
+  }
+  .idmp-ap-card-title { font-size: 13px; font-weight: bold; color: #8a4a00; margin-bottom: 8px; }
+
   /* FDA modal */
   .modal-overlay {
     display: none;
@@ -168,6 +277,171 @@
       <div><div class="label"><b>Marketing Authorisation holder details (SMPC)</b></div><div>{{ summary.ma_holder_smpc }}</div></div>
     </div>
   </div>
+
+  <!-- ── IDMP View ─────────────────────────────────────── -->
+  <div class="card">
+    <h3 style="margin-bottom:6px;">IDMP View</h3>
+    <p style="color:#666; font-size:13px; margin-top:0; margin-bottom:18px;">
+      Structured regulatory data for this product mapped to the IDMP entity hierarchy
+      (ISO&nbsp;11615) — Marketing Authorisation, Medicinal Product, and Administrable Product.
+    </p>
+
+    {% if not idmp_ma %}
+      <p style="color:#999; font-size:13px;">No IDMP data is linked to this authorisation number.</p>
+    {% else %}
+
+    <!-- Marketing Authorisation — Green -->
+    <div class="idmp-band idmp-ma">
+      <div class="idmp-band-title">
+        Marketing Authorisation
+        <span class="idmp-count">({{ idmp_ma|length }} record)</span>
+      </div>
+      {% for ma in idmp_ma %}
+      <div class="idmp-kv-grid">
+        <div>
+          <div class="idmp-kv-label">Authorisation Number</div>
+          <div class="idmp-kv-value"><strong>{{ ma.Authorisation_Number }}</strong></div>
+        </div>
+        <div>
+          <div class="idmp-kv-label">Status</div>
+          <div class="idmp-kv-value">
+            {% if ma.Authorisation_Status %}
+              <span class="idmp-badge-active">{{ ma.Authorisation_Status }}</span>
+            {% else %}<span class="idmp-badge-inactive">Unknown</span>{% endif %}
+          </div>
+        </div>
+        <div>
+          <div class="idmp-kv-label">Status Date</div>
+          <div class="idmp-kv-value">{{ ma.Authorisation_Status_Date }}</div>
+        </div>
+        <div>
+          <div class="idmp-kv-label">First Authorisation Date</div>
+          <div class="idmp-kv-value">{{ ma.First_Authorisation_Date }}</div>
+        </div>
+        <div>
+          <div class="idmp-kv-label">Procedure Type</div>
+          <div class="idmp-kv-value">{{ ma.Procedure_Type }}</div>
+        </div>
+        <div>
+          <div class="idmp-kv-label">Procedure Period</div>
+          <div class="idmp-kv-value">{{ ma.Procedure_Start_date }} — {{ ma.Procedure_End_date }}</div>
+        </div>
+        <div>
+          <div class="idmp-kv-label">Validity Start</div>
+          <div class="idmp-kv-value">{{ ma.Validity_Start_Date }}</div>
+        </div>
+        <div>
+          <div class="idmp-kv-label">Validity End</div>
+          <div class="idmp-kv-value">{{ ma.Validity_End_Date }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Medicinal Product — Yellow -->
+    <div class="idmp-band idmp-mp">
+      <div class="idmp-band-title">
+        Medicinal Product
+        <span class="idmp-count">({{ idmp_mp|length }} name variant(s))</span>
+      </div>
+      {% regroup idmp_mp by Med_Prod_sk as mp_groups %}
+      {% for group in mp_groups %}
+        {% with rows=group.list preferred=group.list.0 %}
+        <div class="idmp-mp-card">
+          <div class="idmp-mp-name">{{ preferred.Full_Name }}</div>
+          <div style="margin-bottom:8px;">
+            {% for r in rows %}
+              {% if not forloop.first %}
+                <span class="idmp-mp-name-pill">{{ r.Full_Name }}{% if r.Language_Code %} ({{ r.Language_Code }}){% endif %}</span>
+              {% endif %}
+            {% endfor %}
+          </div>
+          <div class="idmp-kv-grid" style="margin-bottom:10px;">
+            <div>
+              <div class="idmp-kv-label">MPID</div>
+              <div class="idmp-kv-value">{{ preferred.MPID }}</div>
+            </div>
+            <div>
+              <div class="idmp-kv-label">Internal MPID</div>
+              <div class="idmp-kv-value">{{ preferred.Internal_MPID }}</div>
+            </div>
+            <div>
+              <div class="idmp-kv-label">Jurisdiction</div>
+              <div class="idmp-kv-value">{{ preferred.Jurisdiction }}</div>
+            </div>
+            <div>
+              <div class="idmp-kv-label">Combined Dose Form</div>
+              <div class="idmp-kv-value">{{ preferred.Combined_Dose_Form }}</div>
+            </div>
+            <div>
+              <div class="idmp-kv-label">Strength</div>
+              <div class="idmp-kv-value">{{ preferred.Strength_Part }}</div>
+            </div>
+          </div>
+          <div>
+            {% if preferred.Orphan_designation %}
+              <span class="idmp-flag">&#127913; Orphan Designation</span>
+            {% endif %}
+            {% if preferred.Paediatric_use_indication_flag %}
+              <span class="idmp-flag">&#128118; Paediatric Use</span>
+            {% endif %}
+            {% if preferred.Additional_monitoring_flag %}
+              <span class="idmp-flag">&#9888; Additional Monitoring</span>
+            {% endif %}
+          </div>
+        </div>
+        {% endwith %}
+      {% empty %}
+        <p style="color:#999; font-size:13px;">No medicinal product data found.</p>
+      {% endfor %}
+    </div>
+
+    <!-- Administrable Product — Amber -->
+    <div class="idmp-band idmp-ap">
+      <div class="idmp-band-title">
+        Administrable Product
+        <span class="idmp-count">({{ idmp_ap|length }} product(s))</span>
+      </div>
+      <div class="idmp-ap-cards">
+        {% for ap in idmp_ap %}
+        <div class="idmp-ap-card">
+          <div class="idmp-ap-card-title">{{ ap.Dose_Form }}</div>
+          <div class="idmp-kv-grid" style="grid-template-columns:1fr 1fr; margin-bottom:8px;">
+            <div>
+              <div class="idmp-kv-label">Unit of Presentation</div>
+              <div class="idmp-kv-value">{{ ap.Unit_of_Presentation }}</div>
+            </div>
+            <div>
+              <div class="idmp-kv-label">Release Characteristics</div>
+              <div class="idmp-kv-value">{{ ap.Release_Characteristics }}</div>
+            </div>
+            <div>
+              <div class="idmp-kv-label">Validity Start</div>
+              <div class="idmp-kv-value">{{ ap.Validity_Start_Date }}</div>
+            </div>
+            <div>
+              <div class="idmp-kv-label">MPID</div>
+              <div class="idmp-kv-value">{{ ap.MPID }}</div>
+            </div>
+          </div>
+          {% if ap.Routes %}
+          <div>
+            <div class="idmp-kv-label" style="margin-bottom:4px;">Route(s) of Administration</div>
+            {% for route in ap.Routes.split %}
+              <span class="idmp-route-pill">{{ route }}</span>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+        {% empty %}
+          <p style="color:#999; font-size:13px;">No administrable product data found.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% endif %}
+  </div>
+  <!-- ── End IDMP View ──────────────────────────────────── -->
 
   <div class="card">
     <h3>AI match to EMA Substance Dictionary</h3>

@@ -1,4 +1,5 @@
 {% extends "orphan/base.html" %}
+{% load static %}
 {% block title %}Regulatory Data Portal — Home{% endblock %}
 
 {% block content %}
@@ -29,6 +30,31 @@
        
   </ul>
 </div>
+<section class="smpc-flow">
+  <div class="smpc-header">Digitise SmPCs</div>
+
+  <div class="smpc-cards">
+    <a href="/smpc/" class="card smpc-card">
+      <img src="{% static 'icons/first-version-epi.svg' %}" alt="First version of ePI icon" class="smpc-icon">
+      <div class="smpc-title">First version of ePI</div>
+    </a>
+
+    <a href="/idmp/product-master/" class="card smpc-card">
+      <img src="{% static 'icons/baseline-idmp-dataset.svg' %}" alt="Baseline IDMP Dataset icon" class="smpc-icon">
+      <div class="smpc-title">Baseline IDMP Dataset</div>
+    </a>
+
+    <a href="/orphan/" class="card smpc-card">
+      <img src="{% static 'icons/orphan-designation.svg' %}" alt="Orphan designation icon" class="smpc-icon">
+      <div class="smpc-title">Digitise your Orphan Designation journey </div>
+    </a>
+
+    <a href="/od/apply/" class="card smpc-card">
+      <img src="{% static 'icons/procedural-steps.svg' %}" alt="Procedural steps icon" class="smpc-icon">
+      <div class="smpc-title">Digitise your procedural steps (Requires login)</div>
+    </a>
+  </div>
+</section>
 
 <h3 style="margin-top:30px;">Sections of this Micro-App</h3>
 
