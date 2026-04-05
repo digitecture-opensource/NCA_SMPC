@@ -1,14 +1,12 @@
 {% extends "orphan/base.html" %}
 {% block title %}Regulatory Data Portal — Home{% endblock %}
 
-{% endblock %}
-
 {% block content %}
 <h2 style="color:#8b1111;">Welcome to the Regulatory Data Portal</h2>
 
 <div class="card">
   <p>
-    The version 3 fix  purpose of this app is to showcase a potential approach for regulators to 
+    The purpose of this app is to use the data from MHRA and showcase how regulators currently manage and publish
     datasets that are of huge importance to members of the public, healthcare professionals and hospitals. However,
     due to low investment in technology, a number of regulators such as MHRA, SwissMedic, PMDA and the African Union
     struggle to surface this data in a structured, interactive, searchable format that increases the utility of those datasets.
@@ -25,123 +23,9 @@
   </ul>
 </div>
 
-<div class=”card”>
-  <h3 style=”color:#1a6b4a; text-align:center; margin-top:0; margin-bottom:4px;”>What can you unlock by digitising your data?</h3>
-  <p style=”text-align:center; color:#666; font-size:13px; margin-bottom:20px;”>
-    Digitising your SMPCs is the first step. Once your data is structured, a cascade of regulatory improvements becomes possible.
-  </p>
-
-  <!-- Root box -->
-  <div style=”text-align:center;”>
-    <span style=”display:inline-block; border:2px solid #1a6b4a; border-radius:10px; padding:9px 36px; font-weight:bold; font-size:14px; color:#1a6b4a; background:#fff;”>
-      Digitise your SMPCs
-    </span>
-  </div>
-
-  <!-- Connector: vertical stem then horizontal bar with 4 drops -->
-  <!-- Uses a table so the geometry is browser-guaranteed -->
-  <table style=”width:100%; border-collapse:collapse; table-layout:fixed; margin:0;”>
-    <tr>
-      <!-- vertical stem: only centre two cells carry a bottom border meeting the horizontal bar -->
-      <td style=”width:12.5%; height:18px;”></td>
-      <td style=”width:12.5%; height:18px; border-bottom:2px solid #1a6b4a;”></td>
-      <td style=”width:25%;  height:18px; border-bottom:2px solid #1a6b4a; text-align:center; vertical-align:bottom; padding:0;”>
-        <!-- stem from root to horizontal bar -->
-        <div style=”width:2px; height:18px; background:#1a6b4a; margin:0 auto;”></div>
-      </td>
-      <td style=”width:25%;  height:18px; border-bottom:2px solid #1a6b4a;”></td>
-      <td style=”width:12.5%; height:18px; border-bottom:2px solid #1a6b4a;”></td>
-      <td style=”width:12.5%; height:18px;”></td>
-    </tr>
-    <tr>
-      <!-- drops down from horizontal bar to each of the 4 column boxes -->
-      <td style=”height:18px;”></td>
-      <td style=”height:18px; text-align:center; vertical-align:top; padding:0;”>
-        <div style=”width:2px; height:18px; background:#1a6b4a; margin:0 auto;”></div>
-      </td>
-      <td style=”height:18px; text-align:center; vertical-align:top; padding:0;”>
-        <div style=”width:2px; height:18px; background:#1a6b4a; margin:0 auto;”></div>
-      </td>
-      <td style=”height:18px; text-align:center; vertical-align:top; padding:0;”>
-        <div style=”width:2px; height:18px; background:#1a6b4a; margin:0 auto;”></div>
-      </td>
-      <td style=”height:18px; text-align:center; vertical-align:top; padding:0;”>
-        <div style=”width:2px; height:18px; background:#1a6b4a; margin:0 auto;”></div>
-      </td>
-      <td style=”height:18px;”></td>
-    </tr>
-  </table>
-
-  <!-- Four column boxes and bullets -->
-  <div style=”display:flex; gap:16px; align-items:flex-start;”>
-
-    <div style=”flex:1; display:flex; flex-direction:column; align-items:center;”>
-      <a href=”#section-smpc” style=”display:block; width:100%; text-align:center; border:2px solid #1a6b4a; border-radius:10px; padding:8px 10px; font-weight:bold; font-size:13px; color:#1a6b4a; background:#fff; text-decoration:none; box-sizing:border-box;”>
-        First version of ePI
-      </a>
-      <ul style=”font-size:12.5px; color:#444; line-height:1.65; padding-left:18px; margin:10px 0 0; width:100%;”>
-        <li>Day 1 benefit: first step toward electronic Patient Information (ePI)</li>
-        <li>Reinforce regulator’s image as a trustworthy, collaborative provider of medicinal product data</li>
-        <li>Drive transparency and improved patient and healthcare engagement</li>
-      </ul>
-    </div>
-
-    <div style=”flex:1; display:flex; flex-direction:column; align-items:center;”>
-      <a href=”#section-idmp” style=”display:block; width:100%; text-align:center; border:2px solid #1a6b4a; border-radius:10px; padding:8px 10px; font-weight:bold; font-size:13px; color:#1a6b4a; background:#fff; text-decoration:none; box-sizing:border-box;”>
-        Baseline IDMP Dataset
-      </a>
-      <ul style=”font-size:12.5px; color:#444; line-height:1.65; padding-left:18px; margin:10px 0 0; width:100%;”>
-        <li>First step towards IDMP transformation</li>
-        <li>Surface core three datasets in an IDMP-compliant structure</li>
-        <li>Get ready for PhPID ingestion</li>
-        <li>Satisfy all Pharmacovigilance use cases with this dataset</li>
-      </ul>
-    </div>
-
-    <div style=”flex:1; display:flex; flex-direction:column; align-items:center;”>
-      <a href=”#section-orphan” style=”display:block; width:100%; text-align:center; border:2px solid #1a6b4a; border-radius:10px; padding:8px 10px; font-weight:bold; font-size:13px; color:#1a6b4a; background:#fff; text-decoration:none; box-sizing:border-box;”>
-        Digitise your Orphan Designation journey
-      </a>
-      <ul style=”font-size:12.5px; color:#444; line-height:1.65; padding-left:18px; margin:10px 0 0; width:100%;”>
-        <li>Encourage pharma companies to develop drugs for rare diseases</li>
-        <li>More transparency on the process and journey for patients</li>
-        <li>Enable transparency on exclusivity and review dates</li>
-        <li>Make your country a better place to do business with</li>
-      </ul>
-    </div>
-
-    <div style=”flex:1; display:flex; flex-direction:column; align-items:center;”>
-      <span style=”display:block; width:100%; text-align:center; border:2px solid #1a6b4a; border-radius:10px; padding:8px 10px; font-weight:bold; font-size:13px; color:#1a6b4a; background:#fff; box-sizing:border-box;”>
-        Digitise your procedural steps
-      </span>
-      <ul style=”font-size:12.5px; color:#444; line-height:1.65; padding-left:18px; margin:10px 0 0; width:100%;”>
-        <li>Build digital tools to raise questions and seek clarifications online</li>
-        <li>Deprecate Word documents and PDFs while retaining ability to generate them for eCTD compliance</li>
-        <li>Get ready to embrace cloud-based regulatory systems via APIs — adapt, not adopt</li>
-      </ul>
-    </div>
-
-  </div>
-</div>
-
-
 <h3 style="margin-top:30px;">Sections of this Micro-App</h3>
 
-<div class="card" id="section-smpc">
-  <h3 style="color:#8b1111; margin-top:0;"><a href="/smpc/" style="color:#8b1111;">Digitised SMPC</a></h3>
-  <p>
-    The SMPC (Summary of Product Characteristics) is a structured document. If the sections of the PDF are extracted
-    into a database, the utility of the data increases manifold. The FDA offers APIs under its OpenFDA framework, but
-    other regulators struggle to offer a similar service.
-  </p>
-  <p>
-    This service takes approximately 400 SMPCs, digitises them, and makes them available as a searchable public portal —
-    demonstrating how regulators could easily make their existing document libraries far more accessible and useful.
-  </p>
-  <a href="/smpc/" style="color:#8b1111; font-weight:bold;">Browse SMPC Listing &rarr;</a>
-</div>
-
-<div class="card" id="section-orphan">
+<div class="card">
   <h3 style="color:#8b1111; margin-top:0;"><a href="/orphan/" style="color:#8b1111;">Orphan Designations</a></h3>
   <p>
     This page shows a listing of all products that have current and past Orphan Designations. The page demonstrates a
@@ -163,6 +47,20 @@
 </div>
 
 <div class="card">
+  <h3 style="color:#8b1111; margin-top:0;"><a href="/smpc/" style="color:#8b1111;">Digitised SMPC</a></h3>
+  <p>
+    The SMPC (Summary of Product Characteristics) is a structured document. If the sections of the PDF are extracted
+    into a database, the utility of the data increases manifold. The FDA offers APIs under its OpenFDA framework, but
+    other regulators struggle to offer a similar service.
+  </p>
+  <p>
+    This service takes approximately 400 SMPCs, digitises them, and makes them available as a searchable public portal —
+    demonstrating how regulators could easily make their existing document libraries far more accessible and useful.
+  </p>
+  <a href="/smpc/" style="color:#8b1111; font-weight:bold;">Browse SMPC Listing &rarr;</a>
+</div>
+
+<div class="card">
   <h3 style="color:#8b1111; margin-top:0;"><a href="/od/apply/" style="color:#8b1111;">Request Orphan Designation</a></h3>
   <p>
     Companies wishing to apply for Orphan Designation can submit their application directly through this portal.
@@ -180,7 +78,7 @@
   <a href="/od/apply/" style="color:#8b1111; font-weight:bold;">Start Orphan Designation Application &rarr;</a>
 </div>
 
-<div class="card" id="section-idmp">
+<div class="card">
   <h3 style="color:#8b1111; margin-top:0;"><a href="/idmp/product-master/" style="color:#8b1111;">IDMP Product Master</a></h3>
   <p>
     One of the core challenges regulators face is that their existing datasets were not built with IDMP in mind.
