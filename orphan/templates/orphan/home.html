@@ -1,6 +1,98 @@
 {% extends "orphan/base.html" %}
 {% block title %}Regulatory Data Portal — Home{% endblock %}
 
+{% block extra_head %}
+<style>
+  /* ── SMPC Unlock Diagram ───────────────────────────── */
+  .diagram-wrap {
+    text-align: center;
+    padding: 8px 0 24px;
+  }
+  .diagram-root-box {
+    display: inline-block;
+    border: 2px solid #1a6b4a;
+    border-radius: 10px;
+    padding: 10px 40px;
+    font-weight: bold;
+    font-size: 15px;
+    color: #1a6b4a;
+    background: #fff;
+  }
+
+  /* Vertical stem from root down to horizontal bar */
+  .diagram-stem {
+    width: 2px;
+    height: 28px;
+    background: #1a6b4a;
+    margin: 0 auto;
+  }
+
+  /* Four columns */
+  .diagram-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 0;
+    position: relative;
+  }
+
+  /* Horizontal bar drawn as top border on the cols wrapper */
+  .diagram-cols::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: calc(12.5%);       /* centre of col 1 */
+    right: calc(12.5%);      /* centre of col 4 */
+    height: 2px;
+    background: #1a6b4a;
+    z-index: 0;
+  }
+
+  .diagram-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 10px;
+  }
+
+  /* Short vertical drop from horizontal bar to each box */
+  .diagram-col-stem {
+    width: 2px;
+    height: 24px;
+    background: #1a6b4a;
+    flex-shrink: 0;
+  }
+
+  .diagram-col-box {
+    border: 2px solid #1a6b4a;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-weight: bold;
+    font-size: 13px;
+    color: #1a6b4a;
+    background: #fff;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    transition: background 0.15s, color 0.15s;
+  }
+  .diagram-col-box:hover {
+    background: #1a6b4a;
+    color: #fff;
+  }
+
+  .diagram-col ul {
+    text-align: left;
+    font-size: 12.5px;
+    color: #444;
+    line-height: 1.65;
+    padding-left: 16px;
+    margin: 10px 0 0;
+    width: 100%;
+  }
+  .diagram-col ul li { margin-bottom: 4px; }
+</style>
+{% endblock %}
+
 {% block content %}
 <h2 style="color:#8b1111;">Welcome to the Regulatory Data Portal</h2>
 
@@ -23,107 +115,77 @@
   </ul>
 </div>
 
-<div class=”card” style=”padding-bottom: 28px;”>
-  <h3 style=”color:#1a6b4a; text-align:center; margin-bottom:6px;”>What can you unlock by digitising your data?</h3>
-  <p style=”text-align:center; color:#555; font-size:13px; margin-bottom:24px;”>
+<div class=”card”>
+  <h3 style=”color:#1a6b4a; text-align:center; margin-top:0; margin-bottom:4px;”>What can you unlock by digitising your data?</h3>
+  <p style=”text-align:center; color:#666; font-size:13px; margin-bottom:20px;”>
     Digitising your SMPCs is the first step. Once your data is structured, a cascade of regulatory improvements becomes possible.
   </p>
 
-  <!-- Top anchor box -->
-  <div style=”display:flex; justify-content:center; margin-bottom:0;”>
-    <div style=”
-      border: 2px solid #1a6b4a;
-      border-radius: 10px;
-      padding: 10px 36px;
-      font-weight: bold;
-      font-size: 15px;
-      color: #1a6b4a;
-      background: #fff;
-    “>Digitise your SMPCs</div>
-  </div>
+  <div class=”diagram-wrap”>
 
-  <!-- Connector line down -->
-  <div style=”display:flex; justify-content:center; height:28px;”>
-    <div style=”width:2px; background:#1a6b4a;”></div>
-  </div>
+    <!-- Root node -->
+    <div class=”diagram-root-box”>Digitise your SMPCs</div>
 
-  <!-- Horizontal bar -->
-  <div style=”height:2px; background:#1a6b4a; margin: 0 12px;”></div>
+    <!-- Stem from root down to horizontal bar -->
+    <div class=”diagram-stem”></div>
 
-  <!-- Four column connectors -->
-  <div style=”display:grid; grid-template-columns:1fr 1fr 1fr 1fr; margin:0 12px;”>
-    <div style=”display:flex; justify-content:center; height:20px;”><div style=”width:2px; background:#1a6b4a;”></div></div>
-    <div style=”display:flex; justify-content:center; height:20px;”><div style=”width:2px; background:#1a6b4a;”></div></div>
-    <div style=”display:flex; justify-content:center; height:20px;”><div style=”width:2px; background:#1a6b4a;”></div></div>
-    <div style=”display:flex; justify-content:center; height:20px;”><div style=”width:2px; background:#1a6b4a;”></div></div>
-  </div>
+    <!-- Four branches -->
+    <div class=”diagram-cols”>
 
-  <!-- Four column cards -->
-  <div style=”display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:16px; margin:0 12px;”>
-
-    <!-- ePI -->
-    <div>
-      <a href=”#section-smpc” style=”text-decoration:none;”>
-        <div style=”border:2px solid #1a6b4a; border-radius:10px; padding:10px 14px; font-weight:bold; font-size:13px; color:#1a6b4a; text-align:center; background:#fff; margin-bottom:12px;”>
-          First version of ePI
-        </div>
-      </a>
-      <ul style=”font-size:13px; color:#444; line-height:1.7; padding-left:18px; margin:0;”>
-        <li>Day 1 benefit: first step toward electronic Patient Information (ePI)</li>
-        <li>Reinforce regulator’s image as a trustworthy, collaborative provider of medicinal product data</li>
-        <li>Drive transparency and improved patient and healthcare engagement</li>
-      </ul>
-    </div>
-
-    <!-- IDMP -->
-    <div>
-      <a href=”#section-idmp” style=”text-decoration:none;”>
-        <div style=”border:2px solid #1a6b4a; border-radius:10px; padding:10px 14px; font-weight:bold; font-size:13px; color:#1a6b4a; text-align:center; background:#fff; margin-bottom:12px;”>
-          Baseline IDMP Dataset
-        </div>
-      </a>
-      <ul style=”font-size:13px; color:#444; line-height:1.7; padding-left:18px; margin:0;”>
-        <li>First step towards IDMP transformation</li>
-        <li>Surface core three datasets in an IDMP-compliant structure</li>
-        <li>Get ready for PhPID ingestion</li>
-        <li>Satisfy all Pharmacovigilance use cases with this dataset</li>
-      </ul>
-    </div>
-
-    <!-- Orphan -->
-    <div>
-      <a href=”#section-orphan” style=”text-decoration:none;”>
-        <div style=”border:2px solid #1a6b4a; border-radius:10px; padding:10px 14px; font-weight:bold; font-size:13px; color:#1a6b4a; text-align:center; background:#fff; margin-bottom:12px;”>
-          Digitise your Orphan Designation journey
-        </div>
-      </a>
-      <ul style=”font-size:13px; color:#444; line-height:1.7; padding-left:18px; margin:0;”>
-        <li>Encourage pharma companies to develop drugs for rare diseases</li>
-        <li>More transparency on the process and journey for patients</li>
-        <li>Enable transparency on exclusivity and review dates</li>
-        <li>Make your country a better place to do business with</li>
-      </ul>
-    </div>
-
-    <!-- Procedural -->
-    <div>
-      <div style=”border:2px solid #1a6b4a; border-radius:10px; padding:10px 14px; font-weight:bold; font-size:13px; color:#1a6b4a; text-align:center; background:#fff; margin-bottom:12px;”>
-        Digitise your procedural steps
+      <!-- ePI -->
+      <div class=”diagram-col”>
+        <div class=”diagram-col-stem”></div>
+        <a class=”diagram-col-box” href=”#section-smpc”>First version of ePI</a>
+        <ul>
+          <li>Day 1 benefit: first step toward electronic Patient Information (ePI)</li>
+          <li>Reinforce regulator’s image as a trustworthy, collaborative provider of medicinal product data</li>
+          <li>Drive transparency and improved patient and healthcare engagement</li>
+        </ul>
       </div>
-      <ul style=”font-size:13px; color:#444; line-height:1.7; padding-left:18px; margin:0;”>
-        <li>Build digital tools to raise questions and seek clarifications online</li>
-        <li>Deprecate Word documents and PDFs while retaining the ability to generate them for eCTD compliance</li>
-        <li>Get ready to embrace cloud-based regulatory systems via APIs — adapt, not adopt</li>
-      </ul>
-    </div>
 
+      <!-- IDMP -->
+      <div class=”diagram-col”>
+        <div class=”diagram-col-stem”></div>
+        <a class=”diagram-col-box” href=”#section-idmp”>Baseline IDMP Dataset</a>
+        <ul>
+          <li>First step towards IDMP transformation</li>
+          <li>Surface core three datasets in an IDMP-compliant structure</li>
+          <li>Get ready for PhPID ingestion</li>
+          <li>Satisfy all Pharmacovigilance use cases with this dataset</li>
+        </ul>
+      </div>
+
+      <!-- Orphan -->
+      <div class=”diagram-col”>
+        <div class=”diagram-col-stem”></div>
+        <a class=”diagram-col-box” href=”#section-orphan”>Digitise your Orphan Designation journey</a>
+        <ul>
+          <li>Encourage pharma companies to develop drugs for rare diseases</li>
+          <li>More transparency on the process and journey for patients</li>
+          <li>Enable transparency on exclusivity and review dates</li>
+          <li>Make your country a better place to do business with</li>
+        </ul>
+      </div>
+
+      <!-- Procedural -->
+      <div class=”diagram-col”>
+        <div class=”diagram-col-stem”></div>
+        <span class=”diagram-col-box”>Digitise your procedural steps</span>
+        <ul>
+          <li>Build digital tools to raise questions and seek clarifications online</li>
+          <li>Deprecate Word documents and PDFs while retaining ability to generate them for eCTD compliance</li>
+          <li>Get ready to embrace cloud-based regulatory systems via APIs — adapt, not adopt</li>
+        </ul>
+      </div>
+
+    </div>
   </div>
 </div>
 
 
 <h3 style="margin-top:30px;">Sections of this Micro-App</h3>
 
-<div class="card">
+<div class="card" id="section-smpc">
   <h3 style="color:#8b1111; margin-top:0;"><a href="/smpc/" style="color:#8b1111;">Digitised SMPC</a></h3>
   <p>
     The SMPC (Summary of Product Characteristics) is a structured document. If the sections of the PDF are extracted
@@ -137,7 +199,7 @@
   <a href="/smpc/" style="color:#8b1111; font-weight:bold;">Browse SMPC Listing &rarr;</a>
 </div>
 
-<div class="card">
+<div class="card" id="section-orphan">
   <h3 style="color:#8b1111; margin-top:0;"><a href="/orphan/" style="color:#8b1111;">Orphan Designations</a></h3>
   <p>
     This page shows a listing of all products that have current and past Orphan Designations. The page demonstrates a
@@ -176,7 +238,7 @@
   <a href="/od/apply/" style="color:#8b1111; font-weight:bold;">Start Orphan Designation Application &rarr;</a>
 </div>
 
-<div class="card">
+<div class="card" id="section-idmp">
   <h3 style="color:#8b1111; margin-top:0;"><a href="/idmp/product-master/" style="color:#8b1111;">IDMP Product Master</a></h3>
   <p>
     One of the core challenges regulators face is that their existing datasets were not built with IDMP in mind.
