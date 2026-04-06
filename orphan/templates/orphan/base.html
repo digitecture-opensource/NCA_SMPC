@@ -1,7 +1,9 @@
+{% load static %}
 <!doctype html>
 <html>
 <head>
   <meta charset="utf-8">
+  <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
   <title>{% block title %}Regulator's Data Portal{% endblock %}</title>
   <meta name="description" content="A proof-of-concept regulatory data portal that transforms non-IDMP-compliant datasets from medicines regulators into structured, IDMP-aligned outputs — covering Marketing Authorisations, Medicinal Products, Orphan Designations and SMPCs.">
   <meta name="keywords" content="IDMP, ISO 11615, ISO 11616, SPOR, regulatory data, marketing authorisation, medicinal product, MHRA,SwissMedic, African Union, EMA, IDMP compliance, non-IDMP to IDMP, regulatory data transformation, FHIR, substance management, product master data">
