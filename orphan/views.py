@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .services import load_page1_df, load_page2_details, load_smpc_list_df, load_smpc_detail, load_idmp_product_master, load_idmp_for_orphan
@@ -7,6 +7,8 @@ import logging
 import urllib.request
 import urllib.parse
 import json
+import re
+from difflib import SequenceMatcher
 logger = logging.getLogger("orphan.views")
 
 
@@ -97,7 +99,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect("/")
+    return redirect("/login/")
 
 
 def idmp_product_master(request):
@@ -284,6 +286,10 @@ def smpc_detail(request, smpc_id: int):
         "s_8_authorisation_number",
         "S_9_authorisation_date",
         "S_10_revision_date",
+        "ai_ema_substance",
+        "ai_ema_sms_id",
+        "ai_confidence",
+        "ai_rationale",
     ]
     summary = {k: record.get(k, "") for k in summary_keys}
 
@@ -295,8 +301,139 @@ def smpc_detail(request, smpc_id: int):
         if col not in skip and record[col] != ""
     ]
 
+    # Fetch FDA products if EMA substance is available
+    ema_substance = summary.get("ai_ema_substance", "")
+    fda_products = _fetch_fda_products(ema_substance) if ema_substance else []
+
     return render(request, "orphan/smpc_detail.html", {
         "smpc_id": smpc_id,
         "summary": summary,
         "sections": sections,
+        "fda_products": fda_products,
+        "fda_substance": ema_substance,
     })
+
+
+def _word_diff(text1: str, text2: str) -> list:
+    """Compare two texts at word level and return list of (word, status) tuples.
+    Status: 'same', 'deleted', 'added'
+    Normalizes whitespace to single spaces for cleaner display.
+    """
+    # Normalize whitespace: collapse multiple whitespace chars (newlines, tabs, spaces) into single space
+    text1 = re.sub(r'\s+', ' ', text1.strip())
+    text2 = re.sub(r'\s+', ' ', text2.strip())
+
+    # Split into words (split by spaces, but preserve space between words)
+    words1 = text1.split()
+    words2 = text2.split()
+
+    matcher = SequenceMatcher(None, words1, words2)
+    result = []
+
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag == 'equal':
+            for idx, word in enumerate(words1[i1:i2]):
+                result.append((word, 'same'))
+                if idx < len(words1[i1:i2]) - 1:
+                    result.append((' ', 'same'))
+        elif tag == 'delete':
+            for idx, word in enumerate(words1[i1:i2]):
+                result.append((word, 'deleted'))
+                if idx < len(words1[i1:i2]) - 1:
+                    result.append((' ', 'deleted'))
+        elif tag == 'insert':
+            for idx, word in enumerate(words2[j1:j2]):
+                result.append((word, 'added'))
+                if idx < len(words2[j1:j2]) - 1:
+                    result.append((' ', 'added'))
+        elif tag == 'replace':
+            for idx, word in enumerate(words1[i1:i2]):
+                result.append((word, 'deleted'))
+                if idx < len(words1[i1:i2]) - 1:
+                    result.append((' ', 'deleted'))
+            for idx, word in enumerate(words2[j1:j2]):
+                result.append((word, 'added'))
+                if idx < len(words2[j1:j2]) - 1:
+                    result.append((' ', 'added'))
+
+    return result
+
+
+def smpc_compare(request, smpc_id1: int, smpc_id2: int):
+    """Compare two SMPC documents side-by-side with word-level diff highlighting."""
+    try:
+        df1 = load_smpc_detail(smpc_id1)
+        df2 = load_smpc_detail(smpc_id2)
+    except Exception as e:
+        raise Http404(f"Could not load SMPCs. Error: {e}")
+
+    if df1.empty or df2.empty:
+        raise Http404("One or both SMPCs not found")
+
+    record1 = df1.fillna("").to_dict(orient="records")[0]
+    record2 = df2.fillna("").to_dict(orient="records")[0]
+
+    # Summary fields
+    summary_keys = [
+        "S1_Name_of_Medicinal_product",
+        "S2_Composition",
+        "S3_pharmaceutical_form",
+        "S_7_marketing_authorisation_holder",
+        "s_8_authorisation_number",
+        "S_9_authorisation_date",
+        "S_10_revision_date",
+    ]
+    summary1 = {k: record1.get(k, "") for k in summary_keys}
+    summary2 = {k: record2.get(k, "") for k in summary_keys}
+
+    # Get all section keys (skip id and summary fields)
+    skip = {"id"} | set(summary_keys)
+    all_section_keys = set()
+    for col in record1:
+        if col not in skip and record1[col] != "":
+            all_section_keys.add(col)
+    for col in record2:
+        if col not in skip and record2[col] != "":
+            all_section_keys.add(col)
+
+    all_section_keys = sorted(all_section_keys)
+
+    # Compare sections
+    sections = []
+    for key in all_section_keys:
+        text1 = record1.get(key, "")
+        text2 = record2.get(key, "")
+        is_identical = text1 == text2
+
+        # Word-level diff
+        if not is_identical:
+            word_diff = _word_diff(text1, text2)
+        else:
+            word_diff = None
+
+        sections.append({
+            "name": key,
+            "text1": text1,
+            "text2": text2,
+            "is_identical": is_identical,
+            "word_diff": word_diff,  # Only populated if different
+        })
+
+    return render(request, "orphan/smpc_compare.html", {
+        "smpc_id1": smpc_id1,
+        "smpc_id2": smpc_id2,
+        "summary1": summary1,
+        "summary2": summary2,
+        "sections": sections,
+    })
+
+
+def api_smpc_list(request):
+    """API endpoint returning JSON list of all SMPCs for comparison selector."""
+    try:
+        df = load_smpc_list_df()
+        data = df.fillna("").to_dict("records")
+        return JsonResponse(data, safe=False)
+    except Exception as e:
+        logger.error("Failed to load SMPC list for API: %s", e)
+        return JsonResponse({"error": str(e)}, status=500)

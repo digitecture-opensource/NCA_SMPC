@@ -1,9 +1,102 @@
 {% extends "orphan/base.html" %}
-{% block title %}SMPC Details - {{ summary.S1_Name_of_Medicinal_product }}{% endblock %}
+{% block title %}SmPC Details - {{ summary.S1_Name_of_Medicinal_product }}{% endblock %}
 
 {% block extra_head %}
 <style>
   .grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+
+  .compare-controls {
+    background: #f0f8ff;
+    border: 1px solid #b0d4ff;
+    border-radius: 4px;
+    padding: 12px;
+    margin-bottom: 16px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .compare-controls label {
+    font-weight: bold;
+    font-size: 13px;
+    color: #333;
+  }
+
+  .compare-controls input[type="text"] {
+    padding: 6px 8px;
+    border: 1px solid #999;
+    border-radius: 3px;
+    font-size: 13px;
+    min-width: 200px;
+    position: relative;
+  }
+
+  .autocomplete-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .autocomplete-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    border: 1px solid #999;
+    border-top: none;
+    border-radius: 0 0 3px 3px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    min-width: 200px;
+    display: none;
+  }
+
+  .autocomplete-list.open {
+    display: block;
+  }
+
+  .autocomplete-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .autocomplete-item:hover,
+  .autocomplete-item.selected {
+    background: #f0f8ff;
+  }
+
+  .autocomplete-item:last-child {
+    border-bottom: none;
+  }
+
+  .autocomplete-empty {
+    padding: 8px 12px;
+    color: #999;
+    font-size: 13px;
+  }
+
+  .compare-controls button {
+    padding: 6px 16px;
+    background: #4169e1;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.2s;
+  }
+
+  .compare-controls button:hover {
+    background: #315acc;
+  }
+
+  .compare-controls button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
 
   /* Section tabs */
   .tab-bar { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
@@ -45,20 +138,291 @@
     max-height: 520px;
     overflow-y: auto;
   }
+
+  /* FDA modal */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: #fff;
+    border-radius: 6px;
+    padding: 28px 32px;
+    max-width: 860px;
+    width: 95%;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  }
+  .modal-close {
+    position: absolute; top: 14px; right: 18px;
+    font-size: 22px; cursor: pointer; color: #666; border: none; background: none;
+  }
+  .modal-close:hover { color: #8b1111; }
+  .modal-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .modal-table th, .modal-table td {
+    text-align: left;
+    padding: 6px 10px;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+  }
+  .modal-table th { width: 35%; color: #555; font-weight: normal; }
+  .modal-table td { color: #222; }
+  .modal-section-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #8b1111;
+    margin: 18px 0 8px;
+    border-bottom: 1px solid #f1e0e0;
+    padding-bottom: 4px;
+  }
+  .sub-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .sub-table th {
+    background: #f4f4f4;
+    padding: 5px 8px;
+    text-align: left;
+    border-bottom: 2px solid #e0e0e0;
+    font-size: 12px;
+  }
+  .sub-table td {
+    padding: 5px 8px;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+  }
+  .doc-link {
+    display: inline-block;
+    margin: 3px 6px 3px 0;
+    padding: 3px 10px;
+    border: 1px solid #8b1111;
+    border-radius: 12px;
+    font-size: 11px;
+    color: #8b1111;
+    text-decoration: none;
+  }
+  .doc-link:hover { background: #8b1111; color: #fff; }
 </style>
 <script>
   function showTab(id, btn) {
-    document.querySelectorAll(".section-pane").forEach(p => p.classList.remove("visible"));
-    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-    document.getElementById(id).classList.add("visible");
+    document.querySelectorAll(".section-pane").forEach(p => {
+      p.classList.remove("visible");
+      p.hidden = true;
+    });
+    document.querySelectorAll(".tab-btn").forEach(b => {
+      b.classList.remove("active");
+      b.setAttribute("aria-selected", "false");
+    });
+    const panel = document.getElementById(id);
+    panel.classList.add("visible");
+    panel.hidden = false;
     btn.classList.add("active");
+    btn.setAttribute("aria-selected", "true");
   }
+
+  let allSmpcData = [];
+  let selectedIndex = -1;
+  let currentSmpcId = null;
+
+  async function initAutocomplete() {
+    try {
+      const idDiv = document.querySelector('[data-smpc-id]');
+      currentSmpcId = parseInt(idDiv.getAttribute('data-smpc-id'));
+
+      const response = await fetch('/api/smpc-list/');
+      allSmpcData = await response.json();
+      allSmpcData = allSmpcData.filter(smpc => smpc.id !== currentSmpcId);
+    } catch (error) {
+      console.error('Failed to load SmPC list:', error);
+    }
+  }
+
+  function filterAndShowSuggestions(query) {
+    const input = document.getElementById('compare-input');
+    const list = document.getElementById('autocomplete-listbox');
+    selectedIndex = -1;
+
+    if (!query.trim()) {
+      list.classList.remove('open');
+      input.setAttribute('aria-expanded', 'false');
+      return;
+    }
+
+    const filtered = allSmpcData.filter(smpc =>
+      smpc.auth_number.toLowerCase().includes(query.toLowerCase())
+    );
+
+    list.innerHTML = '';
+    if (filtered.length === 0) {
+      list.innerHTML = '<div class="autocomplete-empty">No SmPCs found</div>';
+      list.classList.add('open');
+      input.setAttribute('aria-expanded', 'true');
+      return;
+    }
+
+    filtered.forEach((smpc, idx) => {
+      const div = document.createElement('div');
+      div.className = 'autocomplete-item';
+      div.setAttribute('role', 'option');
+      div.setAttribute('data-id', smpc.id);
+      div.textContent = `${smpc.auth_number}`;
+      div.onclick = () => selectSmpc(smpc);
+      list.appendChild(div);
+    });
+
+    list.classList.add('open');
+    input.setAttribute('aria-expanded', 'true');
+  }
+
+  function selectSmpc(smpc) {
+    const input = document.getElementById('compare-input');
+    const list = document.getElementById('autocomplete-listbox');
+    input.value = smpc.auth_number;
+    list.classList.remove('open');
+    input.setAttribute('aria-expanded', 'false');
+    input.setAttribute('data-selected-id', smpc.id);
+  }
+
+  function goToComparison() {
+    const input = document.getElementById('compare-input');
+    const smpcId2 = input.getAttribute('data-selected-id');
+    if (smpcId2 && currentSmpcId) {
+      window.location.href = `/smpc/${currentSmpcId}/compare/${smpcId2}/`;
+    } else {
+      alert('Please select a SmPC from the suggestions');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initAutocomplete();
+
+    const input = document.getElementById('compare-input');
+    const list = document.getElementById('autocomplete-listbox');
+
+    input.addEventListener('input', (e) => {
+      filterAndShowSuggestions(e.target.value);
+    });
+
+    input.addEventListener('keydown', (e) => {
+      const items = list.querySelectorAll('.autocomplete-item');
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+        updateSelection(items);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        selectedIndex = Math.max(selectedIndex - 1, -1);
+        updateSelection(items);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (selectedIndex >= 0 && items[selectedIndex]) {
+          const smpcId = items[selectedIndex].getAttribute('data-id');
+          const smpcNum = items[selectedIndex].textContent;
+          selectSmpc({ id: parseInt(smpcId), auth_number: smpcNum });
+        }
+      } else if (e.key === 'Escape') {
+        list.classList.remove('open');
+        input.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.autocomplete-container')) {
+        list.classList.remove('open');
+        input.setAttribute('aria-expanded', 'false');
+      }
+    });
+  });
+
+  function updateSelection(items) {
+    items.forEach((item, idx) => {
+      if (idx === selectedIndex) {
+        item.classList.add('selected');
+        item.scrollIntoView({ block: 'nearest' });
+      } else {
+        item.classList.remove('selected');
+      }
+    });
+  }
+
+  function openFdaModal(id) {
+    const overlay = document.getElementById(id);
+    overlay.classList.add("open");
+    overlay._trigger = document.activeElement;
+    const focusable = overlay.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusable.length) focusable[0].focus();
+    overlay._focusTrap = function(e) {
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.key === 'Tab') {
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+      if (e.key === 'Escape') closeFdaModal(id);
+    };
+    overlay.addEventListener('keydown', overlay._focusTrap);
+  }
+
+  function closeFdaModal(id) {
+    const overlay = document.getElementById(id);
+    overlay.classList.remove("open");
+    overlay.removeEventListener('keydown', overlay._focusTrap);
+    if (overlay._trigger) overlay._trigger.focus();
+  }
+
+  document.addEventListener("click", function(e) {
+    if (e.target.classList.contains("modal-overlay")) {
+      const modalId = e.target.id;
+      closeFdaModal(modalId);
+    }
+  });
 </script>
 {% endblock %}
 
 {% block content %}
-  <a href="/smpc/" class="back-link">&larr; SMPC Search</a>
-  <h2>SMPC Details: {{ summary.S1_Name_of_Medicinal_product }}</h2>
+  <div data-smpc-id="{{ smpc_id }}"></div>
+
+  <a href="/smpc/" class="back-link">&larr; SmPC Search</a>
+  <h1>SmPC Details: {{ summary.S1_Name_of_Medicinal_product }}</h1>
+
+  <!-- Comparison selector -->
+  <div class="compare-controls">
+    <label for="compare-input">Compare with another SmPC (by PL Number):</label>
+    <div class="autocomplete-container">
+      <input type="text" id="compare-input"
+             role="combobox"
+             aria-expanded="false"
+             aria-autocomplete="list"
+             aria-controls="autocomplete-listbox"
+             aria-haspopup="listbox"
+             placeholder="e.g., PL 12345/0001"
+             autocomplete="off">
+      <div id="autocomplete-listbox" role="listbox" class="autocomplete-list"
+           aria-label="SmPC suggestions"></div>
+    </div>
+    <button type="button" onclick="goToComparison()" id="compare-btn">Compare</button>
+  </div>
 
   <div class="card">
     <h3>Summary</h3>
@@ -79,30 +443,201 @@
   {% if sections %}
   <div class="card">
     <h3>Further information for: {{ summary.S1_Name_of_Medicinal_product }}</h3>
-    <p style="color:#666; font-size:13px; margin-top:-8px;">Select a section below to read the extracted SMPC content.</p>
-    <div class="tab-bar">
+    <p style="color:#666; font-size:13px; margin-top:-8px;">Select a section below to read the extracted SmPC content.</p>
+    <div class="tab-bar" role="tablist" aria-label="SmPC sections">
       {% for k, v in sections %}
         <button type="button" class="tab-btn {% if forloop.first %}active{% endif %}"
+                role="tab"
+                id="tab-{{ forloop.counter }}"
+                aria-controls="pane{{ forloop.counter }}"
+                aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
                 onclick="showTab('pane{{ forloop.counter }}', this)">{{ k }}</button>
       {% endfor %}
     </div>
     {% for k, v in sections %}
-      <div class="section-pane {% if forloop.first %}visible{% endif %}" id="pane{{ forloop.counter }}">
+      <div class="section-pane {% if forloop.first %}visible{% endif %}"
+           id="pane{{ forloop.counter }}"
+           role="tabpanel"
+           aria-labelledby="tab-{{ forloop.counter }}"
+           {% if not forloop.first %}hidden{% endif %}>
         <div class="section-title">{{ k }}</div>
         <div class="section-body">{{ v }}</div>
       </div>
     {% endfor %}
-  <p> While the PoC currently only shows the content in a simple text format, the underlying data structure allows for 
-    much richer presentation formats, such as tabular data, bullet points, or even multimedia content — 
-    demonstrating the potential for a future ePI (electronic Product Information) system.
-  
-  The microsite can also be extended to include additional features and functionality in the future such as 
-  <ul>
-    <li>Search within the SMPC content on various attributes</li>
-    <li>Highlighting of key information such as contraindications, side effects, or dosage instructions or coding these to MEDDRA</li>
-    <li>Comparison of different SMPCs for similar products or compare two versions of the same SMPC Pdf</li>
-    <li>Download options for the structured data in formats like CSV or JSON</li>
-  </ul></p> 
+
   </div>
   {% endif %}
+
+  {% if summary.ai_ema_substance %}
+  <div class="card">
+    <h3>AI match to EMA Substance Dictionary</h3>
+    <p style="margin-top:6px; color:#555;">
+      We analysed the SmPC composition text and searched for the closest equivalent in EMA's published substance dictionary.
+      The suggested match and supporting details are shown below.
+    </p>
+    <div class="grid" style="margin-top:10px;">
+      <div style="grid-column:1 / -1;">
+        <div class="label"><b>SmPC composition / active substance</b></div>
+        <div style="white-space:pre-wrap; max-height:140px; overflow:auto; padding:8px; border:1px solid #eee; background:#fff;">
+          {{ summary.S2_Composition }}
+        </div>
+      </div>
+      <div>
+        <div class="label"><b>Matched EMA substance</b></div>
+        <div><b>{{ summary.ai_ema_substance }}</b></div>
+      </div>
+      <div>
+        <div class="label"><b>EMA SMS ID</b></div>
+        <div style="font-family:Consolas, monospace;">{{ summary.ai_ema_sms_id }}</div>
+      </div>
+      <div>
+        <div class="label"><b>Confidence</b></div>
+        <div>
+          <span style="display:inline-block; padding:4px 10px; border-radius:12px; background:#eee;">
+            {{ summary.ai_confidence }}
+          </span>
+          <div style="font-size:12px; color:#777; margin-top:4px;">Higher confidence means the match is more likely to be correct.</div>
+        </div>
+      </div>
+      <div style="grid-column:1 / -1;">
+        <details style="margin-top:8px;">
+          <summary style="cursor:pointer;"><b>Show AI rationale</b></summary>
+          <div style="margin-top:8px; white-space:pre-wrap; padding:8px; border:1px solid #eee; background:#fff;">
+            {{ summary.ai_rationale }}
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if fda_substance %}
+  <div class="card">
+    <h3>FDA Approved Products &mdash; <em>{{ fda_substance }}</em></h3>
+    <p style="color:#555; font-size:13px; margin-top:-6px;">
+      Products approved by the FDA containing the matched EMA substance, sourced from
+      <a href="https://open.fda.gov/apis/drug/drugsfda/" target="_blank" rel="noopener" aria-label="OpenFDA Drugs@FDA (opens in new tab)">OpenFDA Drugs@FDA</a>.
+    </p>
+
+    {% if fda_products %}
+    <div style="overflow:auto;">
+      <table style="font-size:13px;">
+        <thead>
+          <tr>
+            <th scope="col">Application No.</th>
+            <th scope="col">Sponsor</th>
+            <th scope="col">Brand Name</th>
+            <th scope="col">Active Ingredient(s)</th>
+            <th scope="col">Strength</th>
+            <th scope="col">Dosage Form</th>
+            <th scope="col">Route</th>
+            <th scope="col">Marketing Status</th>
+            <th scope="col">Pharmacological Class</th>
+            <th scope="col">More Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in fda_products %}
+          <tr>
+            <td>{{ p.application_number }}</td>
+            <td>{{ p.sponsor }}</td>
+            <td>{{ p.brand_name }}</td>
+            <td>{{ p.active_ingredients }}</td>
+            <td>{{ p.strength }}</td>
+            <td>{{ p.dosage_form }}</td>
+            <td>{{ p.route }}</td>
+            <td>{{ p.marketing_status }}</td>
+            <td style="font-size:12px;">{{ p.pharm_class }}</td>
+            <td>
+              <button class="tab-btn" style="border-radius:4px; font-size:12px; padding:4px 10px;"
+                      onclick="openFdaModal('fda-modal-{{ forloop.counter }}')">View</button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- FDA detail modals -->
+    {% for p in fda_products %}
+    <div class="modal-overlay" id="fda-modal-{{ forloop.counter }}">
+      <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="fda-modal-title-{{ forloop.counter }}">
+        <button class="modal-close" aria-label="Close" onclick="closeFdaModal('fda-modal-{{ forloop.counter }}')"
+                title="Close (press Escape)"><span aria-hidden="true">&times;</span></button>
+        <h3 style="color:#8b1111; margin-top:0;" id="fda-modal-title-{{ forloop.counter }}">{{ p.brand_name }} &mdash; {{ p.application_number }}</h3>
+
+        <div class="modal-section-title">Product Details</div>
+        <table class="modal-table">
+          <tr><th scope="row">Application No.</th><td>{{ p.application_number }}</td></tr>
+          <tr><th scope="row">Sponsor</th><td>{{ p.sponsor }}</td></tr>
+          <tr><th scope="row">Brand Name</th><td>{{ p.brand_name }}</td></tr>
+          <tr><th scope="row">Generic Name</th><td>{{ p.generic_name }}</td></tr>
+          <tr><th scope="row">Active Ingredient(s)</th><td>{{ p.active_ingredients }}</td></tr>
+          <tr><th scope="row">Strength</th><td>{{ p.strength }}</td></tr>
+          <tr><th scope="row">Dosage Form</th><td>{{ p.dosage_form }}</td></tr>
+          <tr><th scope="row">Route</th><td>{{ p.route }}</td></tr>
+          <tr><th scope="row">Marketing Status</th><td>{{ p.marketing_status }}</td></tr>
+          <tr><th scope="row">Pharmacological Class</th><td>{{ p.pharm_class }}</td></tr>
+        </table>
+
+        <div class="modal-section-title">Submissions ({{ p.submissions|length }})</div>
+        {% if p.submissions %}
+        <table class="sub-table">
+          <thead>
+            <tr>
+              <th scope="col">Type / No.</th>
+              <th scope="col">Class</th>
+              <th scope="col">Status</th>
+              <th scope="col">Date</th>
+              <th scope="col">Review</th>
+              <th scope="col">Documents</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for sub in p.submissions %}
+            <tr>
+              <td>{{ sub.type }}-{{ sub.number }}</td>
+              <td>{{ sub.class }}</td>
+              <td>{{ sub.status }}</td>
+              <td>{{ sub.status_date }}</td>
+              <td>{{ sub.review_priority }}</td>
+              <td>
+                {% if sub.docs %}
+                  {% for doc in sub.docs %}
+                    <a class="doc-link" href="{{ doc.url }}" target="_blank" rel="noopener" aria-label="{{ doc.type }}{% if doc.date %} ({{ doc.date }}){% endif %} (opens in new tab)">
+                      {{ doc.type }}{% if doc.date %} ({{ doc.date }}){% endif %}
+                    </a>
+                  {% endfor %}
+                {% else %}
+                  <span style="color:#aaa;">—</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+          <p style="color:#aaa; font-size:13px;">No submissions available.</p>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+
+    {% else %}
+      <p style="color:#666;">No FDA-approved products found for <strong>{{ fda_substance }}</strong>.</p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+    <p> While the PoC currently only shows the content in a simple text format, the underlying data structure allows for
+    much richer presentation formats, such as tabular data, bullet points, or even multimedia content —
+    demonstrating the potential for a future ePI (electronic Product Information) system.
+
+  The microsite can also be extended to include additional features and functionality in the future such as
+  <ul>
+    <li>Search within the SmPC content on various attributes</li>
+    <li>Highlighting of key information such as contraindications, side effects, or dosage instructions or coding these to MEDDRA</li>
+    <li>Comparison of different SmPCs for similar products or compare two versions of the same SmPC Pdf</li>
+    <li>Download options for the structured data in formats like CSV or JSON</li>
+  </ul></p>
 {% endblock %}

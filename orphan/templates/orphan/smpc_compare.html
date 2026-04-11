@@ -1,0 +1,337 @@
+{% extends "orphan/base.html" %}
+{% block title %}SmPC Comparison{% endblock %}
+
+{% block extra_head %}
+<style>
+  .compare-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .compare-summary {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 12px;
+    font-size: 13px;
+  }
+
+  .compare-summary .label {
+    font-weight: bold;
+    color: #666;
+    font-size: 12px;
+    margin-top: 8px;
+  }
+
+  .compare-summary .label:first-child {
+    margin-top: 0;
+  }
+
+  .compare-controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .toggle-btn {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    background: #f4f4f4;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.2s;
+  }
+
+  .toggle-btn.active {
+    background: #8b1111;
+    color: white;
+    border-color: #8b1111;
+  }
+
+  .toggle-btn:hover {
+    background: #e8e8e8;
+  }
+
+  .toggle-btn.active:hover {
+    background: #7a0f0f;
+  }
+
+  .section-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: #f9f9f9;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+  }
+
+  .section-row.identical {
+    background: #f0f8f0;
+    border-color: #b0d0b0;
+  }
+
+  .section-col {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .section-header {
+    font-weight: bold;
+    font-size: 13px;
+    color: #444;
+    margin-bottom: 8px;
+    padding: 6px 8px;
+    background: #e8e8e8;
+    border-radius: 3px;
+  }
+
+  .section-content {
+    font-size: 13px;
+    font-family: Georgia, 'Times New Roman', serif;
+    line-height: 1.6;
+    color: #222;
+    white-space: pre-wrap;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    padding: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .section-content.plain {
+    background: #f5f5f5;
+  }
+
+  /* Word-level diff styles */
+  .word-diff-item {
+    display: inline;
+    white-space: normal;
+    word-wrap: break-word;
+  }
+
+  .word-same {
+    background: transparent;
+  }
+
+  .word-deleted {
+    background: #ffcccc;
+    text-decoration: line-through;
+  }
+
+  .word-added {
+    background: #ffffcc;
+    color: inherit;
+  }
+
+  .section-content.word-diff-container {
+    white-space: normal;
+    word-wrap: break-word;
+    line-height: 1.6;
+  }
+
+  .identical-badge {
+    display: inline-block;
+    background: #90ee90;
+    color: #1a5a1a;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 8px;
+  }
+
+  .diff-legend {
+    margin: 12px 0;
+    padding: 10px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+
+  .diff-legend strong {
+    margin-right: 12px;
+  }
+
+  .diff-legend .word-deleted {
+    margin: 0 4px;
+    padding: 0 3px;
+  }
+
+  .diff-legend .word-added {
+    margin: 0 4px;
+    padding: 0 3px;
+  }
+
+  .back-link {
+    color: #8b1111;
+    text-decoration: none;
+    font-size: 13px;
+    margin-bottom: 12px;
+    display: inline-block;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<script>
+  function toggleShowIdentical() {
+    const btn = document.querySelector('#toggle-identical-btn');
+    const rows = document.querySelectorAll('.section-row.identical');
+    const isShowing = btn.classList.contains('active');
+
+    if (isShowing) {
+      btn.classList.remove('active');
+      btn.setAttribute('aria-pressed', 'false');
+      btn.textContent = 'Show identical sections';
+      rows.forEach(r => r.style.display = 'none');
+    } else {
+      btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
+      btn.textContent = 'Hide identical sections';
+      rows.forEach(r => r.style.display = 'grid');
+    }
+  }
+
+  function toggleDiffMode() {
+    const btn = document.querySelector('#toggle-diff-btn');
+    const isWordLevel = btn.classList.contains('active');
+
+    if (isWordLevel) {
+      btn.classList.remove('active');
+      btn.setAttribute('aria-pressed', 'false');
+      btn.textContent = 'Show word-level diff';
+      document.querySelectorAll('.word-diff-container').forEach(c => c.style.display = 'none');
+      document.querySelectorAll('.plain-text-container').forEach(c => c.style.display = 'block');
+    } else {
+      btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
+      btn.textContent = 'Show plain text';
+      document.querySelectorAll('.word-diff-container').forEach(c => c.style.display = 'block');
+      document.querySelectorAll('.plain-text-container').forEach(c => c.style.display = 'none');
+    }
+  }
+</script>
+{% endblock %}
+
+{% block content %}
+  <a href="/smpc/{{ smpc_id1 }}/" class="back-link">&larr; Back to SmPC detail</a>
+  <h1>SmPC Comparison</h1>
+
+  <!-- Summaries -->
+  <div class="compare-container">
+    <div class="compare-summary">
+      <h2 style="font-size: 16px; margin: 0 0 10px 0; color: #8b1111;">{{ summary1.S1_Name_of_Medicinal_product }}</h2>
+      <div class="label">Auth Number</div>
+      <div>{{ summary1.s_8_authorisation_number }}</div>
+
+      <div class="label">Composition</div>
+      <div style="white-space:pre-wrap; max-height:80px; overflow:auto; padding:4px; font-size:12px;">{{ summary1.S2_Composition }}</div>
+
+      <div class="label">Dose Form</div>
+      <div>{{ summary1.S3_pharmaceutical_form }}</div>
+
+      <div class="label">Auth Holder</div>
+      <div>{{ summary1.S_7_marketing_authorisation_holder }}</div>
+
+      <div class="label">Auth Date</div>
+      <div>{{ summary1.S_9_authorisation_date }}</div>
+
+      <div class="label">Last Revision</div>
+      <div>{{ summary1.S_10_revision_date }}</div>
+    </div>
+
+    <div class="compare-summary">
+      <h4>{{ summary2.S1_Name_of_Medicinal_product }}</h4>
+      <div class="label">Auth Number</div>
+      <div>{{ summary2.s_8_authorisation_number }}</div>
+
+      <div class="label">Composition</div>
+      <div style="white-space:pre-wrap; max-height:80px; overflow:auto; padding:4px; font-size:12px;">{{ summary2.S2_Composition }}</div>
+
+      <div class="label">Dose Form</div>
+      <div>{{ summary2.S3_pharmaceutical_form }}</div>
+
+      <div class="label">Auth Holder</div>
+      <div>{{ summary2.S_7_marketing_authorisation_holder }}</div>
+
+      <div class="label">Auth Date</div>
+      <div>{{ summary2.S_9_authorisation_date }}</div>
+
+      <div class="label">Last Revision</div>
+      <div>{{ summary2.S_10_revision_date }}</div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="compare-controls">
+    <button type="button" class="toggle-btn active" id="toggle-diff-btn"
+            aria-pressed="true" onclick="toggleDiffMode()">
+      Show plain text
+    </button>
+    <button type="button" class="toggle-btn" id="toggle-identical-btn"
+            aria-pressed="false" onclick="toggleShowIdentical()">
+      Show identical sections
+    </button>
+    <span style="color: #999; font-size: 12px;">
+      ({% for sec in sections %}{% if not sec.is_identical %}1{% endif %}{% endfor %} differences across {{ sections|length }} sections)
+    </span>
+  </div>
+
+  <!-- Diff Legend -->
+  <div class="diff-legend" role="note">
+    <strong>Key:</strong>
+    <span class="word-deleted">removed text</span> = deleted &nbsp;
+    <span class="word-added">added text</span> = added
+  </div>
+
+  <!-- Sections -->
+  {% for section in sections %}
+    <div class="section-row {% if section.is_identical %}identical{% endif %}" {% if section.is_identical %}style="display:none;"{% endif %}>
+      <div class="section-col">
+        <div class="section-header">
+          {{ section.name }}
+          {% if section.is_identical %}<span class="identical-badge">Identical</span>{% endif %}
+        </div>
+
+        <!-- Left side: Always plain text, no highlighting -->
+        <div class="section-content plain">{{ section.text1 }}</div>
+      </div>
+
+      <div class="section-col">
+        <div class="section-header">
+          {{ section.name }}
+          {% if section.is_identical %}<span class="identical-badge">Identical</span>{% endif %}
+        </div>
+
+        {% if section.is_identical %}
+          <div class="section-content plain">{{ section.text2 }}</div>
+        {% else %}
+          <!-- Word-level diff on right side only -->
+          <div class="section-content word-diff-container">
+            {% for word, status in section.word_diff %}
+              <span class="word-diff-item word-{{ status }}">{{ word }}</span>
+            {% endfor %}
+          </div>
+          <!-- Plain text toggle -->
+          <div class="section-content plain plain-text-container" style="display:none;">{{ section.text2 }}</div>
+        {% endif %}
+      </div>
+    </div>
+  {% endfor %}
+
+  {% if not sections %}
+    <p style="color: #999; text-align: center; padding: 40px;">No sections to compare.</p>
+  {% endif %}
+{% endblock %}

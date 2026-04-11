@@ -8,28 +8,28 @@
 {% endblock %}
 
 {% block content %}
-  <h2>Orphan Designations Register</h2>
-  <h3 style="color:#666;">Search Parameters</h3>
-  <h4>Please select the product / active substance / authorisation number to filter results.</h4>
+  <h1>Orphan Designations Register</h1>
+  <p style="color:#666;"><strong>Search Parameters</strong></p>
+  <p style="color:#666;">Please select the product / active substance / authorisation number to filter results.</p>
 
   <form class="filters" method="get">
     <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-start;">
 
       <div style="min-width:260px; max-width:420px; flex:1 1 320px;">
-        <label><b>Product name contains</b></label><br>
-        <input type="text" name="product_q" value="{{ product_q }}" style="width:100%; box-sizing:border-box;"
+        <label for="product_q"><b>Product name contains</b></label><br>
+        <input type="text" id="product_q" name="product_q" value="{{ product_q }}" style="width:100%; box-sizing:border-box;"
                placeholder="e.g. 'Vyndaqel'">
       </div>
 
       <div style="min-width:260px; max-width:420px; flex:1 1 320px;">
-        <label><b>Active substance contains</b></label><br>
-        <input type="text" name="substance_q" value="{{ substance_q }}" style="width:100%; box-sizing:border-box;"
+        <label for="substance_q"><b>Active substance contains</b></label><br>
+        <input type="text" id="substance_q" name="substance_q" value="{{ substance_q }}" style="width:100%; box-sizing:border-box;"
                placeholder="e.g. 'imatinib'">
       </div>
 
       <div style="min-width:160px; max-width:240px; flex:0 1 200px;">
-        <label><b>OD Status</b></label><br>
-        <select name="status_q" style="width:100%; box-sizing:border-box; height:32px;">
+        <label for="status_q"><b>OD Status</b></label><br>
+        <select id="status_q" name="status_q" style="width:100%; box-sizing:border-box; height:32px;">
           <option value="" {% if not status_q %}selected{% endif %}>— All —</option>
           <option value="Current" {% if status_q == "Current" %}selected{% endif %}>Current</option>
           <option value="Expired" {% if status_q == "Expired" %}selected{% endif %}>Expired</option>
@@ -37,18 +37,18 @@
       </div>
 
       <div style="min-width:160px; max-width:220px; flex:0 1 200px;">
-        <label><b>Expiry after</b></label><br>
-        <input type="date" name="expiry_after" value="{{ expiry_after }}" style="width:100%; box-sizing:border-box; height:32px;">
+        <label for="expiry_after"><b>Expiry after</b></label><br>
+        <input type="date" id="expiry_after" name="expiry_after" value="{{ expiry_after }}" style="width:100%; box-sizing:border-box; height:32px;">
       </div>
 
       <div style="min-width:160px; max-width:220px; flex:0 1 200px;">
-        <label><b>Expiry before</b></label><br>
-        <input type="date" name="expiry_before" value="{{ expiry_before }}" style="width:100%; box-sizing:border-box; height:32px;">
+        <label for="expiry_before"><b>Expiry before</b></label><br>
+        <input type="date" id="expiry_before" name="expiry_before" value="{{ expiry_before }}" style="width:100%; box-sizing:border-box; height:32px;">
       </div>
 
       <div style="min-width:260px; flex:1 1 320px;">
-        <label><b>Authorisation numbers (paste multiple)</b></label><br>
-        <textarea name="auth_text" rows="3" style="width:100%; box-sizing:border-box;">{{ auth_text }}</textarea>
+        <label for="auth_text"><b>Authorisation numbers (paste multiple)</b></label><br>
+        <textarea id="auth_text" name="auth_text" rows="3" style="width:100%; box-sizing:border-box;">{{ auth_text }}</textarea>
         <div style="font-size:12px; color:#666;">Comma or newline separated. Exact match.</div>
       </div>
 
@@ -56,7 +56,7 @@
 
     <div style="margin-top:10px;">
       <button type="submit">Apply filters</button>
-      <a href="/orphan/" style="margin-left:10px;">Reset</a>
+      <a href="/orphan/" style="margin-left:10px;">Reset filters</a>
     </div>
   </form>
 
@@ -64,6 +64,7 @@
 
   <div style="overflow:auto; max-height:70vh;">
     <table>
+      <caption class="sr-only">Orphan Designations Register results</caption>
       <colgroup>
         <col style="width:10%;">
         <col style="width:6%;">
@@ -77,21 +78,21 @@
       </colgroup>
       <thead>
         <tr>
-          <th>Link to detailed view</th>
-          <th>Internal id - OD</th>
-          <th>SMPC ID (if available)</th>
-          <th>Orphan Designation status</th>
-          <th>Product Name</th>
-          <th>Active substance (Orphan Designation)</th>
-          <th>PL Number</th>
-          <th class="indications">Orphan Designation - indications</th>
-          <th>OD Expiry Date</th>
+          <th scope="col">Link to detailed view</th>
+          <th scope="col">Internal id - OD</th>
+          <th scope="col">SmPC ID (if available)</th>
+          <th scope="col">Orphan Designation status</th>
+          <th scope="col">Product Name</th>
+          <th scope="col">Active substance (Orphan Designation)</th>
+          <th scope="col">PL Number</th>
+          <th scope="col" class="indications">Orphan Designation - indications</th>
+          <th scope="col">OD Expiry Date</th>
         </tr>
       </thead>
       <tbody>
         {% for r in rows %}
           <tr>
-            <td><a href="/orphan/detail/{{ r.orphan_id }}/">See Detailed SMPC and OD Data</a></td>
+            <td><a href="/orphan/detail/{{ r.orphan_id }}/">See Detailed SmPC and OD Data</a></td>
             <td>{{ r.orphan_id }}</td>
             <td>{{ r.smpc_id }}</td>
             <td>{{ r.source_status }}</td>

@@ -45,6 +45,13 @@
     overflow-y: auto;
   }
 
+  /* Accessibility: contrast and focus fixes */
+  .idmp-count { opacity: 1; }
+  .idmp-ma .idmp-count { color: #3d8a5a; }
+  .idmp-mp .idmp-count { color: #7a6000; }
+  .idmp-ap .idmp-count { color: #8a4a00; }
+  .idmp-badge-inactive { color: #595959; }
+
   /* IDMP View section */
   .idmp-band {
     border-radius: 6px;
@@ -233,21 +240,57 @@
 </style>
 <script>
   function showTab(id, btn) {
-    document.querySelectorAll(".section-pane").forEach(p => p.classList.remove("visible"));
-    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-    document.getElementById(id).classList.add("visible");
+    document.querySelectorAll(".section-pane").forEach(p => {
+      p.classList.remove("visible");
+      p.hidden = true;
+    });
+    document.querySelectorAll(".tab-btn").forEach(b => {
+      b.classList.remove("active");
+      b.setAttribute("aria-selected", "false");
+    });
+    const panel = document.getElementById(id);
+    panel.classList.add("visible");
+    panel.hidden = false;
     btn.classList.add("active");
+    btn.setAttribute("aria-selected", "true");
   }
 
   function openFdaModal(id) {
-    document.getElementById(id).classList.add("open");
+    const overlay = document.getElementById(id);
+    overlay.classList.add("open");
+    overlay._trigger = document.activeElement;
+    const focusable = overlay.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusable.length) focusable[0].focus();
+    overlay._focusTrap = function(e) {
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.key === 'Tab') {
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+      if (e.key === 'Escape') closeFdaModal(id);
+    };
+    overlay.addEventListener('keydown', overlay._focusTrap);
   }
+
   function closeFdaModal(id) {
-    document.getElementById(id).classList.remove("open");
+    const overlay = document.getElementById(id);
+    overlay.classList.remove("open");
+    overlay.removeEventListener('keydown', overlay._focusTrap);
+    if (overlay._trigger) overlay._trigger.focus();
   }
+
   document.addEventListener("click", function(e) {
     if (e.target.classList.contains("modal-overlay")) {
-      e.target.classList.remove("open");
+      const modalId = e.target.id;
+      closeFdaModal(modalId);
     }
   });
 </script>
@@ -255,7 +298,7 @@
 
 {% block content %}
   <a href="/orphan/" class="back-link">&larr; Back to Orphan Designations</a>
-  <h2>Detailed SMPC and OD register data for: {{ summary.product_name_od }}</h2>
+  <h1>Detailed SmPC and OD register data for: {{ summary.product_name_od }}</h1>
 
   <div class="card">
     <h3>Data as extracted from Orphan Designation Register</h3>
@@ -268,14 +311,39 @@
   </div>
 
   <div class="card">
-    <h3>Data as extracted from SMPC. (PS: More information at bottom of the page)</h3>
+    <h3>Data as extracted from SmPC. (PS: More information at bottom of the page)</h3>
     <div class="grid">
-      <div><div class="label"><b>Product (SMPC)</b></div><div>{{ summary.product_name_smpc }}</div></div>
-      <div><div class="label"><b>PL Number (SMPC)</b></div><div>{{ summary.pl_number_smpc }}</div></div>
-      <div><div class="label"><b>Composition/ Active Substance (SMPC)</b></div><div>{{ summary.composition_smpc }}</div></div>
-      <div><div class="label"><b>Dose form (SMPC)</b></div><div>{{ summary.dose_form_smpc }}</div></div>
-      <div><div class="label"><b>Marketing Authorisation holder details (SMPC)</b></div><div>{{ summary.ma_holder_smpc }}</div></div>
+      <div><div class="label"><b>Product (SmPC)</b></div><div>{{ summary.product_name_smpc }}</div></div>
+      <div><div class="label"><b>PL Number (SmPC)</b></div><div>{{ summary.pl_number_smpc }}</div></div>
+      <div><div class="label"><b>Composition/ Active Substance (SmPC)</b></div><div>{{ summary.composition_smpc }}</div></div>
+      <div><div class="label"><b>Dose form (SmPC)</b></div><div>{{ summary.dose_form_smpc }}</div></div>
+      <div><div class="label"><b>Marketing Authorisation holder details (SmPC)</b></div><div>{{ summary.ma_holder_smpc }}</div></div>
     </div>
+  </div>
+
+    <div class="card">
+    <h3>Further information for: {{ summary.product_name_smpc }}</h3>
+    <p style="color:#666; font-size:13px; margin-top:-8px;">Select a section below to read the detailed content extracted from the SmPC / Orphan Designation register.</p>
+    <div class="tab-bar" role="tablist" aria-label="SmPC sections">
+      {% for k, v in sections %}
+        <button type="button" class="tab-btn {% if forloop.first %}active{% endif %}"
+                role="tab"
+                id="tab-{{ forloop.counter }}"
+                aria-controls="pane{{ forloop.counter }}"
+                aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+                onclick="showTab('pane{{ forloop.counter }}', this)">{{ k }}</button>
+      {% endfor %}
+    </div>
+    {% for k, v in sections %}
+      <div class="section-pane {% if forloop.first %}visible{% endif %}"
+           id="pane{{ forloop.counter }}"
+           role="tabpanel"
+           aria-labelledby="tab-{{ forloop.counter }}"
+           {% if not forloop.first %}hidden{% endif %}>
+        <div class="section-title">{{ k }}</div>
+        <div class="section-body">{{ v }}</div>
+      </div>
+    {% endfor %}
   </div>
 
   <!-- ── IDMP View ─────────────────────────────────────── -->
@@ -383,13 +451,13 @@
           </div>
           <div>
             {% if preferred.Orphan_designation %}
-              <span class="idmp-flag">&#127913; Orphan Designation</span>
+              <span class="idmp-flag"><span aria-hidden="true">&#127913;</span> Orphan Designation</span>
             {% endif %}
             {% if preferred.Paediatric_use_indication_flag %}
-              <span class="idmp-flag">&#128118; Paediatric Use</span>
+              <span class="idmp-flag"><span aria-hidden="true">&#128118;</span> Paediatric Use</span>
             {% endif %}
             {% if preferred.Additional_monitoring_flag %}
-              <span class="idmp-flag">&#9888; Additional Monitoring</span>
+              <span class="idmp-flag"><span aria-hidden="true">&#9888;</span> Additional Monitoring</span>
             {% endif %}
           </div>
         </div>
@@ -449,12 +517,12 @@
   <div class="card">
     <h3>AI match to EMA Substance Dictionary</h3>
     <p style="margin-top:6px; color:#555;">
-      We analysed the SMPC composition text and searched for the closest equivalent in EMA's published substance dictionary.
+      We analysed the SmPC composition text and searched for the closest equivalent in EMA's published substance dictionary.
       The suggested match and supporting details are shown below.
     </p>
     <div class="grid" style="margin-top:10px;">
       <div style="grid-column:1 / -1;">
-        <div class="label"><b>SMPC composition / active substance</b></div>
+        <div class="label"><b>SmPC composition / active substance</b></div>
         <div style="white-space:pre-wrap; max-height:140px; overflow:auto; padding:8px; border:1px solid #eee; background:#fff;">
           {{ summary.composition_smpc }}
         </div>
@@ -491,7 +559,7 @@
     <h3>FDA Approved Products &mdash; <em>{{ fda_substance }}</em></h3>
     <p style="color:#555; font-size:13px; margin-top:-6px;">
       Products approved by the FDA containing the matched EMA substance, sourced from
-      <a href="https://open.fda.gov/apis/drug/drugsfda/" target="_blank" rel="noopener">OpenFDA Drugs@FDA</a>.
+      <a href="https://open.fda.gov/apis/drug/drugsfda/" target="_blank" rel="noopener" aria-label="OpenFDA Drugs@FDA (opens in new tab)">OpenFDA Drugs@FDA</a>.
     </p>
 
     {% if fda_products %}
@@ -499,16 +567,16 @@
       <table style="font-size:13px;">
         <thead>
           <tr>
-            <th>Application No.</th>
-            <th>Sponsor</th>
-            <th>Brand Name</th>
-            <th>Active Ingredient(s)</th>
-            <th>Strength</th>
-            <th>Dosage Form</th>
-            <th>Route</th>
-            <th>Marketing Status</th>
-            <th>Pharmacological Class</th>
-            <th>More Details</th>
+            <th scope="col">Application No.</th>
+            <th scope="col">Sponsor</th>
+            <th scope="col">Brand Name</th>
+            <th scope="col">Active Ingredient(s)</th>
+            <th scope="col">Strength</th>
+            <th scope="col">Dosage Form</th>
+            <th scope="col">Route</th>
+            <th scope="col">Marketing Status</th>
+            <th scope="col">Pharmacological Class</th>
+            <th scope="col">More Details</th>
           </tr>
         </thead>
         <tbody>
@@ -536,22 +604,23 @@
     <!-- FDA detail modals -->
     {% for p in fda_products %}
     <div class="modal-overlay" id="fda-modal-{{ forloop.counter }}">
-      <div class="modal-box">
-        <button class="modal-close" onclick="closeFdaModal('fda-modal-{{ forloop.counter }}')">&times;</button>
-        <h3 style="color:#8b1111; margin-top:0;">{{ p.brand_name }} &mdash; {{ p.application_number }}</h3>
+      <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="fda-modal-title-{{ forloop.counter }}">
+        <button class="modal-close" aria-label="Close" onclick="closeFdaModal('fda-modal-{{ forloop.counter }}')"
+                title="Close (press Escape)"><span aria-hidden="true">&times;</span></button>
+        <h3 style="color:#8b1111; margin-top:0;" id="fda-modal-title-{{ forloop.counter }}">{{ p.brand_name }} &mdash; {{ p.application_number }}</h3>
 
         <div class="modal-section-title">Product Details</div>
         <table class="modal-table">
-          <tr><th>Application No.</th><td>{{ p.application_number }}</td></tr>
-          <tr><th>Sponsor</th><td>{{ p.sponsor }}</td></tr>
-          <tr><th>Brand Name</th><td>{{ p.brand_name }}</td></tr>
-          <tr><th>Generic Name</th><td>{{ p.generic_name }}</td></tr>
-          <tr><th>Active Ingredient(s)</th><td>{{ p.active_ingredients }}</td></tr>
-          <tr><th>Strength</th><td>{{ p.strength }}</td></tr>
-          <tr><th>Dosage Form</th><td>{{ p.dosage_form }}</td></tr>
-          <tr><th>Route</th><td>{{ p.route }}</td></tr>
-          <tr><th>Marketing Status</th><td>{{ p.marketing_status }}</td></tr>
-          <tr><th>Pharmacological Class</th><td>{{ p.pharm_class }}</td></tr>
+          <tr><th scope="row">Application No.</th><td>{{ p.application_number }}</td></tr>
+          <tr><th scope="row">Sponsor</th><td>{{ p.sponsor }}</td></tr>
+          <tr><th scope="row">Brand Name</th><td>{{ p.brand_name }}</td></tr>
+          <tr><th scope="row">Generic Name</th><td>{{ p.generic_name }}</td></tr>
+          <tr><th scope="row">Active Ingredient(s)</th><td>{{ p.active_ingredients }}</td></tr>
+          <tr><th scope="row">Strength</th><td>{{ p.strength }}</td></tr>
+          <tr><th scope="row">Dosage Form</th><td>{{ p.dosage_form }}</td></tr>
+          <tr><th scope="row">Route</th><td>{{ p.route }}</td></tr>
+          <tr><th scope="row">Marketing Status</th><td>{{ p.marketing_status }}</td></tr>
+          <tr><th scope="row">Pharmacological Class</th><td>{{ p.pharm_class }}</td></tr>
         </table>
 
         <div class="modal-section-title">Submissions ({{ p.submissions|length }})</div>
@@ -559,12 +628,12 @@
         <table class="sub-table">
           <thead>
             <tr>
-              <th>Type / No.</th>
-              <th>Class</th>
-              <th>Status</th>
-              <th>Date</th>
-              <th>Review</th>
-              <th>Documents</th>
+              <th scope="col">Type / No.</th>
+              <th scope="col">Class</th>
+              <th scope="col">Status</th>
+              <th scope="col">Date</th>
+              <th scope="col">Review</th>
+              <th scope="col">Documents</th>
             </tr>
           </thead>
           <tbody>
@@ -578,7 +647,7 @@
               <td>
                 {% if sub.docs %}
                   {% for doc in sub.docs %}
-                    <a class="doc-link" href="{{ doc.url }}" target="_blank" rel="noopener">
+                    <a class="doc-link" href="{{ doc.url }}" target="_blank" rel="noopener" aria-label="{{ doc.type }}{% if doc.date %} ({{ doc.date }}){% endif %} (opens in new tab)">
                       {{ doc.type }}{% if doc.date %} ({{ doc.date }}){% endif %}
                     </a>
                   {% endfor %}
@@ -604,27 +673,12 @@
     {% endif %}
   </div>
 
-  <div class="card">
-    <h3>Further information for: {{ summary.product_name_smpc }}</h3>
-    <p style="color:#666; font-size:13px; margin-top:-8px;">Select a section below to read the detailed content extracted from the SMPC / Orphan Designation register.</p>
-    <div class="tab-bar">
-      {% for k, v in sections %}
-        <button type="button" class="tab-btn {% if forloop.first %}active{% endif %}"
-                onclick="showTab('pane{{ forloop.counter }}', this)">{{ k }}</button>
-      {% endfor %}
-    </div>
-    {% for k, v in sections %}
-      <div class="section-pane {% if forloop.first %}visible{% endif %}" id="pane{{ forloop.counter }}">
-        <div class="section-title">{{ k }}</div>
-        <div class="section-body">{{ v }}</div>
-      </div>
-    {% endfor %}
-  </div>
+
 
   <h4>
-    Link to SMPC:
+    Link to SmPC:
     {% if smpc_url_toHTML %}
-      <a href="{{ smpc_url_toHTML }}" target="_blank" rel="noopener">SMPC on MHRA's Product Portal</a>
+      <a href="{{ smpc_url_toHTML }}" target="_blank" rel="noopener" aria-label="SmPC on MHRA's Product Portal (opens in new tab)">SmPC on MHRA's Product Portal</a>
     {% else %}
       <span style="color:#666;">Not available</span>
     {% endif %}

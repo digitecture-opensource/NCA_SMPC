@@ -1,40 +1,40 @@
 {% extends "orphan/base.html" %}
-{% block title %}SMPC Search{% endblock %}
+{% block title %}SmPC Search{% endblock %}
 
 {% block content %}
-  <h2>SMPC Search</h2>
+  <h1>SmPC Search</h1>
 
   <form class="filters" method="get">
     <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; margin-bottom:10px;">
       <div style="display:flex; flex-direction:column; min-width:260px; max-width:420px; flex:1 1 300px;">
-        <label><b>Medicinal product name contains</b></label>
-        <input type="text" name="product_q" value="{{ product_q }}"
+        <label for="product_q"><b>Medicinal product name contains</b></label>
+        <input type="text" id="product_q" name="product_q" value="{{ product_q }}"
                style="width:100%; box-sizing:border-box;" placeholder="e.g. 'Vyndaqel'">
       </div>
 
       <div style="display:flex; flex-direction:column; min-width:260px; max-width:420px; flex:1 1 300px;">
-        <label><b>Composition contains</b></label>
-        <input type="text" name="composition_q" value="{{ composition_q }}"
+        <label for="composition_q"><b>Composition contains</b></label>
+        <input type="text" id="composition_q" name="composition_q" value="{{ composition_q }}"
                style="width:100%; box-sizing:border-box;" placeholder="e.g. 'imatinib'">
       </div>
     </div>
 
     <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; margin-bottom:10px;">
       <div style="display:flex; flex-direction:column;">
-        <label><b>Authorisation date after</b></label>
-        <input type="date" name="auth_date_after" value="{{ auth_date_after }}" style="height:32px;">
+        <label for="auth_date_after"><b>Authorisation date after</b></label>
+        <input type="date" id="auth_date_after" name="auth_date_after" value="{{ auth_date_after }}" style="height:32px;">
       </div>
       <div style="display:flex; flex-direction:column;">
-        <label><b>Authorisation date before</b></label>
-        <input type="date" name="auth_date_before" value="{{ auth_date_before }}" style="height:32px;">
+        <label for="auth_date_before"><b>Authorisation date before</b></label>
+        <input type="date" id="auth_date_before" name="auth_date_before" value="{{ auth_date_before }}" style="height:32px;">
       </div>
       <div style="display:flex; flex-direction:column;">
-        <label><b>Revision date after</b></label>
-        <input type="date" name="revision_date_after" value="{{ revision_date_after }}" style="height:32px;">
+        <label for="revision_date_after"><b>Revision date after</b></label>
+        <input type="date" id="revision_date_after" name="revision_date_after" value="{{ revision_date_after }}" style="height:32px;">
       </div>
       <div style="display:flex; flex-direction:column;">
-        <label><b>Revision date before</b></label>
-        <input type="date" name="revision_date_before" value="{{ revision_date_before }}" style="height:32px;">
+        <label for="revision_date_before"><b>Revision date before</b></label>
+        <input type="date" id="revision_date_before" name="revision_date_before" value="{{ revision_date_before }}" style="height:32px;">
       </div>
     </div>
 
@@ -44,10 +44,11 @@
     </div>
   </form>
 
-  <div style="margin:10px 0; color:#666;">Records: <b>{{ rows|length }}</b> Please click <i>"See Details"</i> of an individual record to see full SMPC for that Product licence</div>
+  <div style="margin:10px 0; color:#666;">Records: <b>{{ rows|length }}</b> Please click <i>"See Details"</i> of an individual record to see full SmPC for that Product licence</div>
 
   <div style="overflow:auto; max-height:70vh;">
     <table>
+      <caption class="sr-only">SmPC search results</caption>
       <colgroup>
         <col style="width:5%;">
         <col style="width:16%;">
@@ -61,15 +62,15 @@
       </colgroup>
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Medicinal Product Name</th>
-          <th>Composition - Active</th>
-          <th>Dose Form</th>
-          <th>Authorisation Holder</th>
-          <th>Auth Number</th>
-          <th>Auth Date</th>
-          <th>Last Revision</th>
-          <th>Details</th>
+          <th scope="col">ID</th>
+          <th scope="col">Medicinal Product Name</th>
+          <th scope="col">Composition - Active</th>
+          <th scope="col">Dose Form</th>
+          <th scope="col">Authorisation Holder</th>
+          <th scope="col">Auth Number</th>
+          <th scope="col">Auth Date</th>
+          <th scope="col">Last Revision</th>
+          <th scope="col">Details</th>
         </tr>
       </thead>
       <tbody>
