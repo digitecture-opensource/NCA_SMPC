@@ -11,6 +11,7 @@ urlpatterns = [
     path("smpc/<int:smpc_id>/", views.smpc_detail, name="smpc_detail"),
     path("smpc/<int:smpc_id1>/compare/<int:smpc_id2>/", views.smpc_compare, name="smpc_compare"),
     path("api/smpc-list/", views.api_smpc_list, name="api_smpc_list"),
+    path("api/smpc/<int:smpc_id>/similar/", views.api_smpc_similar_products, name="api_smpc_similar_products"),
     path("login/", views.login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),
     path("od/apply/", views.od_apply, name="od_apply"),

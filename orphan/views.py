@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import Http404, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .services import load_page1_df, load_page2_details, load_smpc_list_df, load_smpc_detail, load_idmp_product_master, load_idmp_for_orphan
+from .services import load_page1_df, load_page2_details, load_smpc_list_df, load_smpc_detail, load_smpc_ema_substances, load_smpc_similar_products, load_idmp_product_master, load_idmp_for_orphan
 import logging
 import urllib.request
 import urllib.parse
@@ -239,6 +239,8 @@ def page2_detail(request, orphan_id: int):
 def smpc_list(request):
     product_q = (request.GET.get("product_q", "") or "").strip()
     composition_q = (request.GET.get("composition_q", "") or "").strip()
+    auth_holder_q = (request.GET.get("auth_holder_q", "") or "").strip()
+    therapeutic_indications_q = (request.GET.get("therapeutic_indications_q", "") or "").strip()
     auth_date_after = (request.GET.get("auth_date_after", "") or "").strip()
     auth_date_before = (request.GET.get("auth_date_before", "") or "").strip()
     revision_date_after = (request.GET.get("revision_date_after", "") or "").strip()
@@ -247,6 +249,8 @@ def smpc_list(request):
     df = load_smpc_list_df(
         product_q=product_q,
         composition_q=composition_q,
+        auth_holder_q=auth_holder_q,
+        therapeutic_indications_q=therapeutic_indications_q,
         auth_date_after=auth_date_after,
         auth_date_before=auth_date_before,
         revision_date_after=revision_date_after,
@@ -259,6 +263,8 @@ def smpc_list(request):
         "rows": rows,
         "product_q": product_q,
         "composition_q": composition_q,
+        "auth_holder_q": auth_holder_q,
+        "therapeutic_indications_q": therapeutic_indications_q,
         "auth_date_after": auth_date_after,
         "auth_date_before": auth_date_before,
         "revision_date_after": revision_date_after,
@@ -305,12 +311,32 @@ def smpc_detail(request, smpc_id: int):
     ema_substance = summary.get("ai_ema_substance", "")
     fda_products = _fetch_fda_products(ema_substance) if ema_substance else []
 
+    # Fetch detailed EMA substance matching data
+    ema_substances_df = load_smpc_ema_substances(smpc_id)
+    ema_substances_data = {
+        "composition": "",
+        "excipients": "",
+        "substances": []
+    }
+
+    if not ema_substances_df.empty:
+        records = ema_substances_df.fillna("").to_dict(orient="records")
+        # Extract composition and excipients from first row (same for all)
+        ema_substances_data["composition"] = records[0].get("smpc_composition", "")
+        ema_substances_data["excipients"] = records[0].get("smpc_excipients", "")
+        # Build substance table data (remove composition/excipients from each row)
+        ema_substances_data["substances"] = [
+            {k: v for k, v in r.items() if k not in ["smpc_composition", "smpc_excipients"]}
+            for r in records
+        ]
+
     return render(request, "orphan/smpc_detail.html", {
         "smpc_id": smpc_id,
         "summary": summary,
         "sections": sections,
         "fda_products": fda_products,
         "fda_substance": ema_substance,
+        "ema_substances_data": ema_substances_data,
     })
 
 
@@ -436,4 +462,15 @@ def api_smpc_list(request):
         return JsonResponse(data, safe=False)
     except Exception as e:
         logger.error("Failed to load SMPC list for API: %s", e)
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+def api_smpc_similar_products(request, smpc_id: int):
+    """API endpoint returning similar products based on shared active substances."""
+    try:
+        df = load_smpc_similar_products(smpc_id)
+        data = df.fillna("").to_dict("records")
+        return JsonResponse(data, safe=False)
+    except Exception as e:
+        logger.error("Failed to load similar products for SMPC %d: %s", smpc_id, e)
         return JsonResponse({"error": str(e)}, status=500)

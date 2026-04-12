@@ -139,16 +139,47 @@ SELECT [id]
       ,[s_8_authorisation_number]           AS auth_number
       ,[S_9_authorisation_date]             AS auth_date
       ,[S_10_revision_date]                 AS revision_date
+      ,[S_4_1_therapeutic_indications]      AS therapeutic_indications
 FROM [Staging].[SMPC]
 WHERE id > 160
 """
 
-QUERY_SMPC_DETAIL = "SELECT * FROM [Staging].[SMPC] WHERE id = :smpc_id"
+QUERY_SMPC_DETAIL = """
+SELECT
+    s.*,
+    sub.preferred_name AS ai_ema_substance,
+    sub.sms_id AS ai_ema_sms_id,
+    sas.rationale_substance_match AS ai_rationale,
+    sas.confidence_substance_match AS ai_confidence
+FROM [Staging].[SMPC] s
+LEFT OUTER JOIN Staging.SMPC_Active_Substance sas ON sas.SMPC_id = s.id AND sas.Substance_role = 'Active'
+LEFT OUTER JOIN Staging.Substance sub ON sub.substance_sk = sas.Substance_sk
+WHERE s.id = :smpc_id
+"""
+
+QUERY_SMPC_EMA_SUBSTANCES = """
+SELECT
+    s.[S2_Composition] AS smpc_composition,
+    s.[S_6_1_excipients] AS smpc_excipients,
+    sas.[Substance_role],
+    sub.[preferred_name] AS ema_preferred_name,
+    subN.[name_text] AS mah_specified_name,
+    sas.[rationale_synonym_match],
+    sub.sms_id AS preferred_name_sms_id,
+    subN.sms_id AS synonym_sms_id
+FROM Staging.SMPC s
+INNER JOIN [Staging].[SMPC_Active_Substance] sas ON sas.smpc_id = s.id
+INNER JOIN Staging.Substance sub ON sub.substance_sk = sas.Substance_sk
+LEFT OUTER JOIN [Staging].[Substance_Name] subN ON subN.[substance_name_sk] = sas.[Synonym_id]
+WHERE s.id = :smpc_id
+"""
 
 
 def load_smpc_list_df(
     product_q: str = "",
     composition_q: str = "",
+    auth_holder_q: str = "",
+    therapeutic_indications_q: str = "",
     auth_date_after: str = "",
     auth_date_before: str = "",
     revision_date_after: str = "",
@@ -165,6 +196,14 @@ def load_smpc_list_df(
     if composition_q:
         sql += " AND q.composition LIKE :composition_like"
         params["composition_like"] = f"%{composition_q}%"
+
+    if auth_holder_q:
+        sql += " AND q.auth_holder LIKE :auth_holder_like"
+        params["auth_holder_like"] = f"%{auth_holder_q}%"
+
+    if therapeutic_indications_q:
+        sql += " AND q.therapeutic_indications LIKE :therapeutic_like"
+        params["therapeutic_like"] = f"%{therapeutic_indications_q}%"
 
     if auth_date_after:
         sql += " AND q.auth_date >= :auth_after"
@@ -191,6 +230,32 @@ def load_smpc_list_df(
 def load_smpc_detail(smpc_id: int) -> pd.DataFrame:
     with get_engine().connect() as conn:
         return pd.read_sql_query(text(QUERY_SMPC_DETAIL), conn, params={"smpc_id": smpc_id})
+
+
+def load_smpc_ema_substances(smpc_id: int) -> pd.DataFrame:
+    """Load detailed EMA substance matching data for an SMPC."""
+    with get_engine().connect() as conn:
+        return pd.read_sql_query(text(QUERY_SMPC_EMA_SUBSTANCES), conn, params={"smpc_id": smpc_id})
+
+
+QUERY_SMPC_SIMILAR_PRODUCTS = """
+SELECT
+    s2.id,
+    s2.[s_8_authorisation_number] AS auth_number,
+    LEFT(s2.[S1_Name_of_Medicinal_product], 160) AS product_name_short,
+    CONCAT(s2.[s_8_authorisation_number], ' - ', LEFT(s2.[S1_Name_of_Medicinal_product], 160)) AS similar_product_label
+FROM Staging.SMPC s
+INNER JOIN [Staging].[SMPC_Active_Substance] sas ON sas.smpc_id = s.id AND sas.[Substance_role] = 'Active'
+INNER JOIN [Staging].[SMPC_Active_Substance] sas2 ON sas.[Substance_sk] = sas2.[Substance_sk] AND sas.smpc_id <> sas2.smpc_id
+INNER JOIN Staging.SMPC s2 ON s2.id = sas2.smpc_id
+WHERE s.id > 160 AND s2.id > 160 AND s.id = :smpc_id
+"""
+
+
+def load_smpc_similar_products(smpc_id: int) -> pd.DataFrame:
+    """Load similar products based on shared active substances."""
+    with get_engine().connect() as conn:
+        return pd.read_sql_query(text(QUERY_SMPC_SIMILAR_PRODUCTS), conn, params={"smpc_id": smpc_id})
 
 
 QUERY_IDMP_MA = """
