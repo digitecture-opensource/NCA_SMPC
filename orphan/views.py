@@ -105,6 +105,19 @@ def logout_view(request):
 def idmp_product_master(request):
     try:
         ma_df, mp_df, ap_df = load_idmp_product_master()
+
+        # Remove specified columns from Marketing Authorisation
+        ma_drop_cols = ["Procedure_Type", "Procedure_Start_date", "Procedure_End_date", "Validity_End_Date", "Current_flag", "MA_sk"]
+        ma_df = ma_df.drop(columns=[c for c in ma_drop_cols if c in ma_df.columns])
+
+        # Remove specified columns from Medicinal Product
+        mp_drop_cols = ["MPID", "Jurisdiction", "Med_Prod_sk", "MA_sk", "Pharmaceutical_Dose_Form_Part"]
+        mp_df = mp_df.drop(columns=[c for c in mp_drop_cols if c in mp_df.columns])
+
+        # Remove specified columns from Administrable Product
+        ap_drop_cols = ["AdmProd_sk", "Med_Prod_sk"]
+        ap_df = ap_df.drop(columns=[c for c in ap_drop_cols if c in ap_df.columns])
+
         ma_rows = ma_df.to_dict("records")
         mp_rows = mp_df.to_dict("records")
         ap_rows = ap_df.to_dict("records")

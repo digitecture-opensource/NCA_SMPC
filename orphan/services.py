@@ -168,7 +168,7 @@ SELECT
     sub.sms_id AS preferred_name_sms_id,
     subN.sms_id AS synonym_sms_id
 FROM Staging.SMPC s
-INNER JOIN [Staging].[SMPC_Active_Substance] sas ON sas.smpc_id = s.id
+INNER JOIN [Staging].[SMPC_Active_Substance] sas ON sas.smpc_id = s.id and sas.Substance_role = 'Active'
 INNER JOIN Staging.Substance sub ON sub.substance_sk = sas.Substance_sk
 LEFT OUTER JOIN [Staging].[Substance_Name] subN ON subN.[substance_name_sk] = sas.[Synonym_id]
 WHERE s.id = :smpc_id
