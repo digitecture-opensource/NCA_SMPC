@@ -35,13 +35,13 @@ Python scripts that form an **ETL pipeline** to convert an NCA's existing SmPC P
 |---|---|---|
 | `run_pipeline.py` | Orchestrator | Reads `SMPC_STEPS` from `.env` and runs the selected steps in order |
 | `Step_01_RIM_CV_setup.py` | Step 01 | Loads controlled vocabulary (codelists and terms) into the RIM schema |
-| `PDF_extractor.py` | — | Extracts raw text from SmPC PDFs using PyMuPDF; maps content to standard SmPC section headings |
+| `PDF_extractor.py` | 02 | Extracts raw text from SmPC PDFs using PyMuPDF; maps content to standard SmPC section headings |
+| `header.py` | — | Supports the PDF Extractor  |
 | `Step_10_Substance_map.py` | Step 10 | Uses OpenAI to match active substances in SmPCs to EMA SPOR substance records |
-| `Step_20_Fetch_MP_MA.py` | Step 20 | Fetches Marketing Authorisation and Medicinal Product data from the NCA's source system |
 | `Step_30_load_MHRA_orphan_register.py` | Step 30 | Loads the Orphan Designation register (current + expired) from CSV into the database |
-| `SMPC_Meta_dataload.py` | — | Loads SmPC metadata (file paths, revision dates) |
-| `Populate_SMPC_Substance.py` | — | Populates the substance-to-SmPC mapping table |
-| `WebScrapperMHRAproduct portal.py` | — | Scrapes/downloads SmPC source files from the NCA product portal |
+| `SMPC_Meta_dataload.py` | 11 | Loads SmPC metadata (file paths, revision dates) |
+| `Populate_SMPC_Substance.py` | 12 | Populates the substance-to-SmPC mapping table. Uses de-coupled LLM model using an API call to identify most appropriate match |
+| `WebScrapperMHRAproduct portal.py` | - | Scrapes/downloads SmPC source files from the NCA product portal |
 
 ### Running the pipeline
 
@@ -63,7 +63,7 @@ To run specific steps only, set `SMPC_STEPS=10,20` in your `.env`.
 
 ## Front End (`/Front end` and `/config`)
 
-A **Django web application** that surfaces the digitised SmPC and Orphan Designation data as a searchable public portal, with built-in user authentication for restricted workflows.
+A **Django web application** that surfaces the digitised SmPC and Orphan Designation data as a fully public, searchable portal. All pages are publicly accessible — no login is required.
 
 ### Key files
 
@@ -72,24 +72,22 @@ A **Django web application** that surfaces the digitised SmPC and Orphan Designa
 | `Front end/views.py` | URL handler functions — one per page/API endpoint |
 | `Front end/services.py` | All database queries (read-only SELECT statements via SQLAlchemy) |
 | `Front end/templates/orphan/` | HTML templates for each page |
-| `Front end/middleware.py` | Login-required middleware for protected routes |
 | `Front end/urls.py` | URL routing for the application |
 | `config/settings.py` | Django settings — all secrets loaded from `.env` |
 | `config/db_backends/` | Custom Django DB backend for Azure SQL with Entra token auth |
 
 ### Pages & routes
 
-| URL | Auth required | Description |
-|---|---|---|
-| `/` | No | Home page — project overview and navigation |
-| `/smpc/` | No | Searchable SmPC listing |
-| `/smpc/<id>/` | No | Full SmPC detail with EMA substance matching and FDA cross-reference |
-| `/smpc/<id1>/compare/<id2>/` | No | Side-by-side word-level diff of two SmPCs |
-| `/idmp/product-master/` | No | IDMP-aligned product master (MA → MP → Administrable Product hierarchy) |
-| `/orphan/` | No | Orphan Designation listing with filters |
-| `/orphan/<id>/` | No | Orphan Designation detail with linked IDMP and SmPC data |
-| `/od/apply/` | Yes | Orphan Designation application form (placeholder — persistence not yet wired) |
-| `/login/` | — | Login page |
+| URL | Description |
+|---|---|
+| `/` | Home page — project overview and navigation |
+| `/smpc/` | Searchable SmPC listing |
+| `/smpc/<id>/` | Full SmPC detail with EMA substance matching and FDA cross-reference |
+| `/smpc/<id1>/compare/<id2>/` | Side-by-side word-level diff of two SmPCs |
+| `/idmp/product-master/` | IDMP-aligned product master (MA → MP → Administrable Product hierarchy) |
+| `/orphan/` | Orphan Designation listing with filters |
+| `/orphan/<id>/` | Orphan Designation detail with linked IDMP and SmPC data |
+| `/od/apply/` | Orphan Designation application form (placeholder — persistence not yet wired) |
 
 ### Running locally
 
@@ -143,4 +141,4 @@ This project is intended as a community resource for the NCA and regulatory info
 
 ## Licence
 
-To be confirmed. Intended for open-source release — licence will be added before the first public release.
+MIT Licence. See [LICENSE](LICENSE) for details.
