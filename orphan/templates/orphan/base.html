@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
   <title>{% block title %}Regulator's Data Portal{% endblock %}</title>
-  <meta name="description" content="A proof-of-concept regulatory data portal that transforms non-IDMP-compliant datasets from medicines regulators into structured, IDMP-aligned outputs — covering Marketing Authorisations, Medicinal Products, Orphan Designations and SmPCs.">
+  <meta name="description" content="An open-source reference implementation for National Competent Authorities (NCAs) to digitise SmPC libraries and Orphan Designation workflows, aligned to IDMP standards. Baseline dataset from MHRA; adaptable to any NCA worldwide.">
   <meta name="keywords" content="IDMP, ISO 11615, ISO 11616, SPOR, regulatory data, marketing authorisation, medicinal product, MHRA,SwissMedic, African Union, EMA, IDMP compliance, non-IDMP to IDMP, regulatory data transformation, FHIR, substance management, product master data">
   <meta name="robots" content="index, follow">
   <meta property="og:title" content="{% block og_title %}Regulatory Data Portal — IDMP Dataset Generation{% endblock %}">
@@ -196,7 +196,7 @@
 <a href="#main-content" class="skip-link">Skip to main content</a>
 
 <header>
-  <div class="site-title"><a href="/">Regulator's Data Portal &mdash; Proof of Concept</a></div>
+  <div class="site-title"><a href="/">NCA SmPC &amp; OD Portal &mdash; Open Source Reference Implementation</a></div>
   <nav aria-label="Primary navigation">
     <a href="/">Home</a>
     <a href="/orphan/">Orphan Designations</a>
@@ -210,9 +210,13 @@
 </main>
 
 <footer>
-  <p>This is a Proof of Concept built to demonstrate how regulators can surface public data in structured, searchable formats and unlock path to transformation - 
-    inlucding adopting IDMP standards.</p>
-  <p><a href="https://www.regdata.info" target="_blank" rel="noopener" aria-label="regdata.info (opens in new tab)">regdata.info</a> &mdash; Digitecture Ltd</p>
+  <p>An open-source reference implementation to help National Competent Authorities digitise SmPC libraries and
+    Orphan Designation workflows — aligned to IDMP standards and adaptable to any NCA worldwide.</p>
+  <p>
+    Released under an open-source licence &mdash; contributions welcome.
+    Baseline dataset: <a href="https://products.mhra.gov.uk/" target="_blank" rel="noopener" aria-label="MHRA product portal (opens in new tab)">MHRA Product Portal</a>.
+    Originally developed by <a href="https://www.digitecture.co.uk" target="_blank" rel="noopener" aria-label="Digitecture Ltd (opens in new tab)">Digitecture Ltd</a>.
+  </p>
 </footer>
 
 </body>

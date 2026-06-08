@@ -18,6 +18,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app/
 
+# "Front end/" is the Django app package; create a symlink so it's importable as "orphan"
+RUN ln -sfn "/app/Front end" /app/orphan
+
 ENV DJANGO_DEBUG=0
 RUN python manage.py collectstatic --noinput || true
 

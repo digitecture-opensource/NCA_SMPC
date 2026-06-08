@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Baseline IDMP Dataset icon">
+  <defs>
+    <style>
+      .s{fill:none;stroke:#0b7a6e;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+      .f{fill:#0b7a6e}
+    </style>
+  </defs>
+  <ellipse cx="64" cy="28" rx="28" ry="10" class="f"/>
+  <path d="M36 28v20c0 5.5 12.5 10 28 10s28-4.5 28-10V28" class="s"/>
+  <ellipse cx="64" cy="48" rx="28" ry="10" class="s"/>
+  <path d="M36 48v20c0 5.5 12.5 10 28 10s28-4.5 28-10V48" class="s"/>
+  <ellipse cx="64" cy="68" rx="28" ry="10" class="s"/>
+  <circle cx="22" cy="46" r="6" class="s"/><path d="M28 46h8" class="s"/>
+  <circle cx="106" cy="46" r="6" class="s"/><path d="M92 46h8" class="s"/>
+  <circle cx="22" cy="74" r="6" class="s"/><path d="M28 74h8" class="s"/>
+  <circle cx="106" cy="74" r="6" class="s"/><path d="M92 74h8" class="s"/>
+</svg>

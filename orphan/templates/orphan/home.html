@@ -6,27 +6,33 @@
 <h1 style="color:#8b1111;">Welcome to the Regulatory Data Portal</h1>
 
 <div class="card">
-  <h2 style="color:#8b1111;">Regulators hold some of the most valuable healthcare data in the world</h2>
-  <p>But much of it remains hard to access, search, and truly use.
-
-This portal reimagines how that data could be surfaced. Using publicly available datasets from agencies such as MHRA, SwissMedic and others, it demonstrates how regulatory information can be structured, aligned to IDMP, and made far more intuitive for patients, healthcare professionals and organisations.
-</p>
+  <h2 style="color:#8b1111;">An open-source reference implementation for NCA SmPC &amp; Orphan Designation digitisation</h2>
   <p>
-Built as a <i>proof of concept</i>, this micro-site shows what’s possible today — using AI, open-source technologies,
- and existing data — without the need for large-scale transformation programmes.
-<br>
-It highlights a simple idea:
-<b>with the right approach, regulators can unlock far greater value from the data they already hold.</b>
-  <br><br>
-   <b>Disclaimers: </b> This portal uses publicly available data and is not an official source of regulatory information. 
-   It is intended for demonstration purposes only and should not be used for clinical decision-making or regulatory compliance.
-    The datasets used may not be comprehensive or up-to-date, and the portal does not reflect the full scope of regulatory 
-    data held by agencies. It uses: 
+    This portal is a free, open-source codebase designed to help <strong>National Competent Authorities (NCAs)</strong>
+    digitise their SmPC (Summary of Product Characteristics) libraries and Orphan Designation workflows — without
+    large-scale transformation programmes or proprietary vendor lock-in.
+  </p>
+  <p>
+    The baseline dataset used here is sourced from <strong>MHRA’s public product portal</strong>. MHRA’s SmPC structure
+    follows the globally agreed EU SmPC template (as defined in the <em>Guideline on the SmPC</em>), which means the
+    same codebase can be adapted by <strong>any NCA worldwide</strong> — the sections, headings, and data hierarchy
+    are a recognised international standard, not MHRA-specific.
+  </p>
+  <p>
+    Built using AI-assisted extraction, open-source technologies, and publicly available data, this reference
+    implementation shows what is achievable <em>today</em> — and provides a head start for any NCA that wants to
+    move from PDF documents to structured, searchable, IDMP-aligned product information.
+  </p>
+  <p>
+    <b>Disclaimers:</b> This portal uses publicly available data and is not an official source of regulatory
+    information. It is intended for demonstration and development purposes only and should not be used for
+    clinical decision-making or regulatory compliance. The datasets used may not be comprehensive or up-to-date.
+    Data sources used in this reference implementation:
+  </p>
   <ul>
-    <li>The baseline data for this micro-site is sourced from MHRA's <a href="https://products.mhra.gov.uk/" target="_blank" aria-label="MHRA product portal (opens in new tab)">product portal</a>. Hence the subdomain is dedicated to MHRA</li>
-    <li>The Substances data for this micro-site is sourced from EMA's <a href="https://spor.ema.europa.eu/web-ui-data-backend/download/csv" target="_blank" aria-label="SPOR product portal (opens in new tab)">SPOR product portal</a></li>
-    <li>The portal also demonstrates ability to use  <a href="https://open.fda.gov/apis/" target="_blank" aria-label="OpenFDA APIs (opens in new tab)">OpenFDA APIs</a></li>
-       
+    <li>SmPC baseline data sourced from MHRA’s <a href="https://products.mhra.gov.uk/" target="_blank" aria-label="MHRA product portal (opens in new tab)">product portal</a> — adaptable to any NCA’s equivalent dataset</li>
+    <li>Substances data sourced from EMA’s <a href="https://spor.ema.europa.eu/web-ui-data-backend/download/csv" target="_blank" aria-label="SPOR product portal (opens in new tab)">SPOR portal</a></li>
+    <li>OpenFDA integration demonstrated via <a href="https://open.fda.gov/apis/" target="_blank" aria-label="OpenFDA APIs (opens in new tab)">OpenFDA APIs</a></li>
   </ul>
 </div>
 <section class="smpc-flow" aria-labelledby="smpc-flow-heading">

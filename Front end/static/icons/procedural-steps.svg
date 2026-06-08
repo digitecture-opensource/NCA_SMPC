@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Procedural steps icon">
+  <defs>
+    <style>
+      .s{fill:none;stroke:#0b7a6e;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+      .f{fill:#0b7a6e}
+      .g{fill:#58b947}
+    </style>
+  </defs>
+  <rect x="16" y="72" width="20" height="14" rx="2" class="f"/>
+  <rect x="54" y="52" width="20" height="14" rx="2" class="f"/>
+  <rect x="92" y="32" width="20" height="14" rx="2" class="g"/>
+  <path d="M36 79h18V59h0M74 59h18V39" class="s"/>
+  <circle cx="74" cy="74" r="14" class="s"/>
+  <circle cx="74" cy="74" r="5" class="f"/>
+  <path d="M74 56v6M74 86v6M56 74h6M86 74h6M61.3 61.3l4.2 4.2M82.5 82.5l4.2 4.2M86.7 61.3l-4.2 4.2M65.5 82.5l-4.2 4.2" class="s"/>
+</svg>

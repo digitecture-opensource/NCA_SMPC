@@ -47,7 +47,6 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "orphan.middleware.LoginRequiredMiddleware",
 ]
 
 
@@ -71,9 +70,6 @@ TEMPLATES = [
 
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-
-LOGIN_URL = "/login/"
-LOGIN_REDIRECT_URL = "/"
 
 # Django DB — Azure SQL via Entra token. Used for auth (auth_user already exists in SQL Server).
 DATABASES = {
