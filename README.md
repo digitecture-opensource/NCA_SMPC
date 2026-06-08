@@ -141,4 +141,4 @@ This project is intended as a community resource for the NCA and regulatory info
 
 ## Licence
 
-MIT Licence. See [LICENSE](LICENSE) for details.
+Apache License 2.0. Copyright 2026 Digitecture Limited. See [LICENSE](LICENSE) for details.
